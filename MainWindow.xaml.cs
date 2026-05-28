@@ -14,15 +14,28 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace cybersecurity_chatbot_p2
-{
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+{//start of namespace
     public partial class MainWindow : Window
-    {
+    {//start of class
         public MainWindow()
-        {
+        {//start of constructor
             InitializeComponent();
-        }
-    }
-}
+
+            //creating an instance of the voice_greeting class without an object name
+            new voice_greeting();
+
+        }//end of constructor
+
+        private void proceed(object sender, RoutedEventArgs e)
+        {//start of method
+
+        }//end of method
+
+        private void submit_name(object sender, RoutedEventArgs e)
+        {//start of method
+
+        }//end of method
+
+    }//end of class
+
+}//end of namespace
