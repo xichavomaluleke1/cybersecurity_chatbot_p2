@@ -278,7 +278,7 @@ Sentiment detection
 
 Memory and recall features
 
-YouTube Video link: [Insert your video link here]
+YouTube Video link: https://youtu.be/oJZd3IYDFIE
 
 GitHub Information
 Item	Details
