@@ -1,406 +1,105 @@
 ﻿using System.Collections;
 
 namespace cybersecurity_chatbot_p2
-{//start of namespace
+{
     public class respond
-    {//start of class
+    {
         public respond(ArrayList reply, ArrayList ignore)
-        {//start of constructor
+        {
+            LoadAnswers(reply);
+            LoadIgnoreWords(ignore);
+        }
 
-            answers(reply);
-            words(ignore);
+        private void LoadIgnoreWords(ArrayList ignoreList)
+        {
+            string[] ignoreWords = {
+                "a", "about", "above", "across", "after", "again", "all", "am", "an", "and",
+                "any", "are", "as", "at", "be", "because", "been", "before", "being", "between",
+                "both", "but", "by", "can", "could", "did", "do", "does", "doing", "done",
+                "during", "each", "either", "else", "for", "from", "get", "give", "had",
+                "has", "have", "having", "he", "her", "here", "him", "his", "how", "i",
+                "if", "in", "into", "is", "it", "its", "me", "more", "most", "much",
+                "my", "never", "no", "nor", "not", "nothing", "of", "off", "on", "once",
+                "one", "only", "or", "other", "ought", "our", "out", "over", "own", "same",
+                "she", "should", "so", "some", "such", "than", "that", "the", "their", "them",
+                "then", "there", "these", "they", "this", "those", "through", "to", "too",
+                "under", "until", "up", "very", "was", "we", "were", "what", "when", "where",
+                "which", "while", "who", "whom", "why", "will", "with", "would", "you", "your"
+            };
 
-        }//end of constructor
+            foreach (string word in ignoreWords)
+                ignoreList.Add(word);
+        }
 
-        //method to store the list of words
-        private void words(ArrayList ignoring)
-        {//start of method
+        private void LoadAnswers(ArrayList answers)
+        {
+            // PASSWORD TOPIC
+            answers.Add("password Use strong passwords with at least 12 characters including uppercase, lowercase, numbers, and symbols.");
+            answers.Add("password Never reuse passwords across different accounts. If one gets hacked, all become vulnerable.");
+            answers.Add("password Use a password manager to generate and store unique passwords for each account.");
+            answers.Add("password Avoid using personal information like birthdays, names, or pet names in your passwords.");
+            answers.Add("password Enable Two-Factor Authentication (2FA) whenever possible for an extra layer of security.");
 
-            //ignoring questions
-            ignoring.Add("a");
-            ignoring.Add("about");
-            ignoring.Add("above");
-            ignoring.Add("across");
-            ignoring.Add("after");
-            ignoring.Add("afterwards");
-            ignoring.Add("again");
-            ignoring.Add("against");
-            ignoring.Add("all");
-            ignoring.Add("almost");
-            ignoring.Add("alone");
-            ignoring.Add("along");
-            ignoring.Add("already");
-            ignoring.Add("also");
-            ignoring.Add("although");
-            ignoring.Add("always");
-            ignoring.Add("am");
-            ignoring.Add("among");
-            ignoring.Add("amongst");
-            ignoring.Add("amount");
-            ignoring.Add("an");
-            ignoring.Add("and");
-            ignoring.Add("another");
-            ignoring.Add("any");
-            ignoring.Add("anyhow");
-            ignoring.Add("anyone");
-            ignoring.Add("anything");
-            ignoring.Add("anyway");
-            ignoring.Add("anywhere");
-            ignoring.Add("are");
-            ignoring.Add("around");
-            ignoring.Add("as");
-            ignoring.Add("at");
-            ignoring.Add("back");
-            ignoring.Add("be");
-            ignoring.Add("became");
-            ignoring.Add("because");
-            ignoring.Add("become");
-            ignoring.Add("becomes");
-            ignoring.Add("becoming");
-            ignoring.Add("been");
-            ignoring.Add("before");
-            ignoring.Add("beforehand");
-            ignoring.Add("behind");
-            ignoring.Add("being");
-            ignoring.Add("below");
-            ignoring.Add("beside");
-            ignoring.Add("besides");
-            ignoring.Add("between");
-            ignoring.Add("beyond");
-            ignoring.Add("both");
-            ignoring.Add("but");
-            ignoring.Add("by");
-            ignoring.Add("can");
-            ignoring.Add("cannot");
-            ignoring.Add("could");
-            ignoring.Add("did");
-            ignoring.Add("do");
-            ignoring.Add("does");
-            ignoring.Add("doing");
-            ignoring.Add("done");
-            ignoring.Add("down");
-            ignoring.Add("during");
-            ignoring.Add("each");
-            ignoring.Add("either");
-            ignoring.Add("else");
-            ignoring.Add("elsewhere");
-            ignoring.Add("enough");
-            ignoring.Add("etc");
-            ignoring.Add("even");
-            ignoring.Add("ever");
-            ignoring.Add("every");
-            ignoring.Add("everyone");
-            ignoring.Add("everything");
-            ignoring.Add("everywhere");
-            ignoring.Add("except");
-            ignoring.Add("few");
-            ignoring.Add("first");
-            ignoring.Add("for");
-            ignoring.Add("former");
-            ignoring.Add("formerly");
-            ignoring.Add("from");
-            ignoring.Add("further");
-            ignoring.Add("had");
-            ignoring.Add("has");
-            ignoring.Add("have");
-            ignoring.Add("having");
-            ignoring.Add("he");
-            ignoring.Add("hence");
-            ignoring.Add("her");
-            ignoring.Add("here");
-            ignoring.Add("hereafter");
-            ignoring.Add("hereby");
-            ignoring.Add("herein");
-            ignoring.Add("hereupon");
-            ignoring.Add("hers");
-            ignoring.Add("herself");
-            ignoring.Add("him");
-            ignoring.Add("himself");
-            ignoring.Add("his");
-            ignoring.Add("how");
-            ignoring.Add("however");
-            ignoring.Add("i");
-            ignoring.Add("if");
-            ignoring.Add("in");
-            ignoring.Add("indeed");
-            ignoring.Add("inside");
-            ignoring.Add("instead");
-            ignoring.Add("into");
-            ignoring.Add("is");
-            ignoring.Add("it");
-            ignoring.Add("its");
-            ignoring.Add("itself");
-            ignoring.Add("last");
-            ignoring.Add("later");
-            ignoring.Add("latter");
-            ignoring.Add("latterly");
-            ignoring.Add("least");
-            ignoring.Add("less");
-            ignoring.Add("lot");
-            ignoring.Add("many");
-            ignoring.Add("may");
-            ignoring.Add("me");
-            ignoring.Add("meanwhile");
-            ignoring.Add("might");
-            ignoring.Add("more");
-            ignoring.Add("moreover");
-            ignoring.Add("most");
-            ignoring.Add("mostly");
-            ignoring.Add("much");
-            ignoring.Add("must");
-            ignoring.Add("my");
-            ignoring.Add("myself");
-            ignoring.Add("name");
-            ignoring.Add("namely");
-            ignoring.Add("neither");
-            ignoring.Add("never");
-            ignoring.Add("nevertheless");
-            ignoring.Add("next");
-            ignoring.Add("no");
-            ignoring.Add("nobody");
-            ignoring.Add("none");
-            ignoring.Add("noone");
-            ignoring.Add("nor");
-            ignoring.Add("not");
-            ignoring.Add("nothing");
-            ignoring.Add("now");
-            ignoring.Add("nowhere");
-            ignoring.Add("of");
-            ignoring.Add("off");
-            ignoring.Add("often");
-            ignoring.Add("on");
-            ignoring.Add("once");
-            ignoring.Add("one");
-            ignoring.Add("only");
-            ignoring.Add("or");
-            ignoring.Add("other");
-            ignoring.Add("others");
-            ignoring.Add("otherwise");
-            ignoring.Add("ought");
-            ignoring.Add("our");
-            ignoring.Add("ours");
-            ignoring.Add("ourselves");
-            ignoring.Add("out");
-            ignoring.Add("outside");
-            ignoring.Add("over");
-            ignoring.Add("own");
-            ignoring.Add("part");
-            ignoring.Add("per");
-            ignoring.Add("perhaps");
-            ignoring.Add("please");
-            ignoring.Add("put");
-            ignoring.Add("rather");
-            ignoring.Add("re");
-            ignoring.Add("same");
-            ignoring.Add("see");
-            ignoring.Add("seem");
-            ignoring.Add("seemed");
-            ignoring.Add("seeming");
-            ignoring.Add("seems");
-            ignoring.Add("several");
-            ignoring.Add("she");
-            ignoring.Add("should");
-            ignoring.Add("show");
-            ignoring.Add("side");
-            ignoring.Add("since");
-            ignoring.Add("so");
-            ignoring.Add("some");
-            ignoring.Add("somehow");
-            ignoring.Add("someone");
-            ignoring.Add("something");
-            ignoring.Add("sometime");
-            ignoring.Add("sometimes");
-            ignoring.Add("somewhere");
-            ignoring.Add("still");
-            ignoring.Add("such");
-            ignoring.Add("take");
-            ignoring.Add("than");
-            ignoring.Add("that");
-            ignoring.Add("the");
-            ignoring.Add("their");
-            ignoring.Add("theirs");
-            ignoring.Add("them");
-            ignoring.Add("themselves");
-            ignoring.Add("then");
-            ignoring.Add("thence");
-            ignoring.Add("there");
-            ignoring.Add("thereafter");
-            ignoring.Add("thereby");
-            ignoring.Add("therefore");
-            ignoring.Add("therein");
-            ignoring.Add("thereupon");
-            ignoring.Add("these");
-            ignoring.Add("they");
-            ignoring.Add("this");
-            ignoring.Add("those");
-            ignoring.Add("though");
-            ignoring.Add("through");
-            ignoring.Add("throughout");
-            ignoring.Add("thru");
-            ignoring.Add("thus");
-            ignoring.Add("to");
-            ignoring.Add("together");
-            ignoring.Add("too");
-            ignoring.Add("toward");
-            ignoring.Add("towards");
-            ignoring.Add("under");
-            ignoring.Add("unless");
-            ignoring.Add("until");
-            ignoring.Add("up");
-            ignoring.Add("upon");
-            ignoring.Add("us");
-            ignoring.Add("used");
-            ignoring.Add("very");
-            ignoring.Add("via");
-            ignoring.Add("was");
-            ignoring.Add("we");
-            ignoring.Add("well");
-            ignoring.Add("were");
-            ignoring.Add("what");
-            ignoring.Add("whatever");
-            ignoring.Add("when");
-            ignoring.Add("whence");
-            ignoring.Add("whenever");
-            ignoring.Add("where");
-            ignoring.Add("whereafter");
-            ignoring.Add("whereas");
-            ignoring.Add("whereby");
-            ignoring.Add("wherein");
-            ignoring.Add("whereupon");
-            ignoring.Add("wherever");
-            ignoring.Add("whether");
-            ignoring.Add("which");
-            ignoring.Add("while");
-            ignoring.Add("whither");
-            ignoring.Add("who");
-            ignoring.Add("whoever");
-            ignoring.Add("whole");
-            ignoring.Add("whom");
-            ignoring.Add("whose");
-            ignoring.Add("why");
-            ignoring.Add("will");
-            ignoring.Add("with");
-            ignoring.Add("within");
-            ignoring.Add("without");
-            ignoring.Add("would");
-            ignoring.Add("yes");
-            ignoring.Add("yet");
-            ignoring.Add("you");
-            ignoring.Add("your");
-            ignoring.Add("yours");
-            ignoring.Add("yourself");
-            ignoring.Add("yourselves");
+            // SCAM TOPIC
+            answers.Add("scam Be cautious of unsolicited messages, emails, or calls. Scammers often create a sense of urgency.");
+            answers.Add("scam Never share personal information or send money to someone you haven't verified in person.");
+            answers.Add("scam If something sounds too good to be true, it probably is a scam. Trust your instincts.");
+            answers.Add("scam Legitimate companies will never ask for your password or banking details via email or phone.");
 
-        }//end of method
+            // PRIVACY TOPIC
+            answers.Add("privacy Review your privacy settings on social media regularly. Limit what personal information you share publicly.");
+            answers.Add("privacy Use privacy-focused browsers like DuckDuckGo when possible to avoid being tracked online.");
+            answers.Add("privacy Be careful about what you post online. Once something is on the internet, it's difficult to remove.");
+            answers.Add("privacy Check app permissions on your phone and computer. Only give access to information that is necessary.");
+            answers.Add("privacy Use a VPN when on public Wi-Fi to encrypt your internet traffic and protect your personal information.");
 
-        public ArrayList answers(ArrayList add_answers)
-        {//start of method
+            // PHISHING TOPIC
+            answers.Add("phishing Phishing attacks try to trick you into revealing sensitive information through fake emails or websites.");
+            answers.Add("phishing Always check the URL before entering login credentials. Look for HTTPS and correct domain names.");
+            answers.Add("phishing Hover over links before clicking to see the actual destination URL.");
+            answers.Add("phishing Be wary of urgent language like 'Your account will be closed' - this creates false urgency.");
 
-            add_answers.Add("greeting i'm doing well, thanks for asking! how are you doing today ?");
-            add_answers.Add("greeting i'm great today, thanks for asking! how can i help you today ?");
-            add_answers.Add("greeting doing good! hope you are also doing well today ?");
+            // GREETINGS
+            answers.Add("hello Hello! How can I help you with cybersecurity today?");
+            answers.Add("hello Hi there! Ready to learn about online safety?");
+            answers.Add("hello Greetings! Ask me anything about staying secure online.");
+            answers.Add("hi Hello! How can I help you with cybersecurity today?");
+            answers.Add("hey Hi there! Ready to learn about online safety?");
 
+            // HELP
+            answers.Add("help I can help you with: Passwords, Scams, Privacy, Phishing. Just ask!");
+            answers.Add("help Try asking: 'Tell me about password safety' or 'How to avoid scams?'");
+            answers.Add("help I'm your cybersecurity assistant - ask me about any online safety topic!");
 
-            add_answers.Add("purpose my purpose is to educate you on how to stay safe online and guide your cybersecurity questions.");
-            add_answers.Add("purpose i help users understand online safety and digital protection.");
-            add_answers.Add("purpose i assist with cybersecurity awareness and safety guidance.");
+            // THANKS
+            answers.Add("thanks You're welcome! Stay safe online!");
+            answers.Add("thanks Glad I could help! Remember to practice good cybersecurity habits.");
+            answers.Add("thanks Anytime! Feel free to ask more questions.");
 
+            // SENTIMENT RESPONSES
+            answers.Add("worried I understand you're worried. Cybersecurity concerns are normal. Let me help you stay safe.");
+            answers.Add("worried Don't worry - most security issues can be resolved. What specific concern do you have?");
+            answers.Add("worried It's okay to feel concerned. Let's go through this step by step together.");
 
-            add_answers.Add("cybersecurity cybersecurity is about protecting systems and networks from digital threats.");
-            add_answers.Add("cybersecurity it involves protecting devices and online accounts from attacks.");
-            add_answers.Add("cybersecurity it focuses on securing digital information and systems.");
+            answers.Add("frustrated I hear your frustration. Let's work through this issue together calmly.");
+            answers.Add("frustrated Technology can be frustrating. Take a deep breath - I'm here to help solve this.");
+            answers.Add("frustrated I understand it's frustrating. Let me explain it in a simpler way.");
 
+            answers.Add("confused That's okay, confusion is normal. I'll explain it clearly for you.");
+            answers.Add("confused Let me break it down step by step so it makes sense.");
+            answers.Add("confused No worries, I'll help you understand it better.");
 
-            add_answers.Add("phishing phishing is a scam where attackers pretend to be trusted sources to steal information.");
-            add_answers.Add("phishing it uses fake messages or websites to trick users into revealing sensitive data.");
-            add_answers.Add("phishing attackers use deception to make users believe they are legitimate.");
+            answers.Add("happy That's great to hear! I'm glad things are going well.");
+            answers.Add("happy Awesome! Positivity is always good for learning cybersecurity.");
+            answers.Add("happy I'm happy for you! Let me know if you need anything.");
 
+            answers.Add("sad I'm sorry you're feeling this way. I'm here for you.");
+            answers.Add("sad That sounds tough, take things one step at a time.");
+            answers.Add("sad I hope things improve soon. You can talk to me anytime.");
 
-            add_answers.Add("firewall a firewall controls network traffic based on security rules.");
-            add_answers.Add("firewall it helps block unwanted access to your device or network.");
-            add_answers.Add("firewall it acts as a protective barrier between trusted and untrusted networks.");
-
-
-            add_answers.Add("password a password is used to secure access to your accounts or devices.");
-            add_answers.Add("password it should be strong, long and not easy to guess.");
-            add_answers.Add("password avoid using personal details when creating one.");
-            add_answers.Add("password Create strong passwords that are at least 12 characters long with a mix of uppercase, lowercase, numbers, and symbols.");
-            add_answers.Add("password Never reuse passwords across different accounts. If one gets hacked, all become vulnerable.");
-            add_answers.Add("password Use a password manager to generate and store unique passwords for each account.");
-            add_answers.Add("password Avoid using personal information like birthdays, names, or pet names in your passwords.");
-            add_answers.Add("password Enable two-factor authentication whenever possible for an extra layer of security.");
-
-
-            add_answers.Add("hacked account immediately secure your account and log out of all devices.");
-            add_answers.Add("hacked account contact support if your account has been compromised.");
-            add_answers.Add("hacked account enable extra security like two-factor authentication.");
-
-
-            add_answers.Add("fraud contact your bank immediately if fraud is detected.");
-            add_answers.Add("fraud report suspicious financial activity to the authorities.");
-            add_answers.Add("fraud monitor your accounts for unusual activity.");
-
-
-            add_answers.Add("malicious chatbot malicious bots often create urgency to trick users.");
-            add_answers.Add("malicious chatbot fake chatbots may ask for sensitive information.");
-            add_answers.Add("malicious chatbot be cautious if a bot pressures you for personal data.");
-
-
-            add_answers.Add("vpn a vpn helps protect your privacy on public wi-fi.");
-            add_answers.Add("vpn it encrypts your internet traffic for safety.");
-            add_answers.Add("vpn it improves security when using public networks.");
-
-
-            add_answers.Add("scam Be cautious of unsolicited messages, emails, or calls. Scammers often create a sense of urgency.");
-            add_answers.Add("scam Never share personal information or send money to someone you haven't verified in person.");
-            add_answers.Add("scam If something sounds too good to be true, it probably is a scam. Trust your instincts.");
-            add_answers.Add("scam Legitimate companies will never ask for your password or banking details via email or phone.");
-            add_answers.Add("scam Report suspicious messages to the South African Banking Risk Information Centre (SABRIC).");
-
-
-            add_answers.Add("privacy Review your privacy settings on social media regularly. Limit what personal information you share publicly.");
-            add_answers.Add("privacy Use privacy-focused browsers like DuckDuckGo when possible to avoid tracking.");
-            add_answers.Add("privacy Be careful about what you post online. Once something is on the internet, it's difficult to remove.");
-            add_answers.Add("privacy Check app permissions on your phone and computer. Only give access to information that is necessary.");
-            add_answers.Add("privacy Use a VPN when on public Wi-Fi to encrypt your internet traffic and protect your personal information.");
-
-            //sentiment detection
-
-            add_answers.Add("frustrated i understand you're frustrated. let's work through the issue step by step.");
-            add_answers.Add("frustrated it's okay to feel frustrated when things aren't working. i'm here to help.");
-            add_answers.Add("frustrated take a breath, we'll fix this together.");
-
-
-            add_answers.Add("confused that's okay, confusion is normal. i'll explain it clearly for you.");
-            add_answers.Add("confused let me break it down step by step so it makes sense.");
-            add_answers.Add("confused no worries, i'll help you understand it better.");
-
-
-            add_answers.Add("worried it's okay to feel worried. i'm here to help you stay safe online.");
-            add_answers.Add("worried don't panic, most cybersecurity issues can be fixed quickly.");
-            add_answers.Add("worried i understand your concern. let's make sure your information is safe.");
-
-
-            add_answers.Add("happy that's great to hear! i'm glad things are going well.");
-            add_answers.Add("happy awesome! positivity is always good.");
-            add_answers.Add("happy i'm happy for you! let me know if you need anything.");
-
-
-            add_answers.Add("sad i'm sorry you're feeling this way. i'm here for you.");
-            add_answers.Add("sad that sounds tough, take things one step at a time.");
-            add_answers.Add("sad i hope things improve soon. you can talk to me anytime.");
-
-
-            add_answers.Add("angry i understand you're angry. let's try solve the issue together.");
-            add_answers.Add("angry it's okay to feel angry, but i'll help you fix the problem.");
-            add_answers.Add("angry take your time, i'm here to help you sort it out.");
-
-
-
-            return add_answers;
-
-        }//end of method
-
-    }//end of class
-
-}//end of namespace
+            answers.Add("curious Great curiosity! Cybersecurity is fascinating. What would you like to learn about?");
+            answers.Add("curious I love your interest in staying safe online! Let me share some tips.");
+            answers.Add("curious Curiosity is the first step to good cybersecurity. Ask me anything!");
+        }
+    }
+}

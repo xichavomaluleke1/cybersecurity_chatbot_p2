@@ -7,96 +7,166 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <!-- start of parent-->
+        <!-- HOME GRID -->
+        <Grid x:Name="home_grid" Visibility="Visible" Background="#2C3E50">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- logo grid -->
-        <Grid x:Name="home_grid" Visibility="Visible">
+            <Image Grid.Row="0"
+                   Source="/logo.jpeg" 
+                   Height="150"
+                   Width="150"
+                   HorizontalAlignment="Center"
+                   Margin="0,30,0,10"/>
 
-            <!-- Logo -->
-            <Image 
-                Source="/logo.jpeg" 
-                Height="200"
-                Width="300"
-                Margin="0,0,0,200"
-                   />
-            <!-- welcome message-->
-            <TextBlock
-                Text="Welcome to Jordan AI chatbot, click continue button"
-                Height="20"
-                Width="270"
-                TextAlignment="Center"
-                Margin="0,30,0,0"
-                FontFamily="Arial Rounded MT Bold"
-                />
+            <TextBlock Grid.Row="1"
+                       Text="Cybersecurity Awareness Chatbot"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       Margin="0,20,0,10"/>
 
-            <!-- button to continue-->
-            <Button 
-                Height="40"
-                Width="300"
-                Margin="0,200,0,0"
-                Content="Proceed"
-                Click="proceed"
-                />
+            <TextBlock Grid.Row="2"
+                       Text="Your Personal Cybersecurity Assistant"
+                       FontSize="14"
+                       Foreground="#BDC3C7"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,20"/>
 
+            <Button Grid.Row="3"
+                    Content="Start Chatting"
+                    Height="40"
+                    Width="150"
+                    Background="#2ECC71"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="proceed"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,50"/>
         </Grid>
-        <!--end of logo grid-->
 
-        <!--username grid -->
-        <Grid x:Name="username_grid" 
-              Visibility="Hidden">
+        <!-- USERNAME GRID -->
+        <Grid x:Name="username_grid" Visibility="Hidden" Background="#2C3E50">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
+            <Image Grid.Row="0"
+                   Source="/logo.jpeg" 
+                   Height="100"
+                   Width="100"
+                   HorizontalAlignment="Center"
+                   Margin="0,30,0,10"/>
 
-            <!-- Logo -->
-            <Image 
-                Source="/logo.jpeg"
-                Height="200"
-                Width="300"
-                Margin="0,0,0,200"
-           />
-            <!-- Hint message-->
-            <TextBlock
-                Text="Enter username"
-                Height="20"
-                Width="270"
-                TextAlignment="Justify"
-                Margin="0,30,0,0"
-                FontFamily="Arial Rounded MT Bold"
-                 />
+            <TextBlock Grid.Row="1"
+                       Text="Welcome!"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       Margin="0,20,0,10"/>
 
-            <!-- Enter/Prompt username-->
-            <TextBox
-                Height="40"
-                Width="270"
-                TextAlignment="Center"
-                Margin="0,100,0,0"
-                FontFamily="Arial Rounded MT Bold"
-                x:Name="usernames_input"
-                />
+            <TextBlock Grid.Row="2"
+                       Text="Enter your name to begin"
+                       FontSize="14"
+                       Foreground="#BDC3C7"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,20"/>
 
-            <!-- error message-->
-            <TextBlock
-                Text="please enter username to continue..."
-                Height="20"
-                Width="270"
-                TextAlignment="Justify"
-                Margin="0,180,0,0"
-                Foreground="Red"
-                FontFamily="Arial Rounded MT Bold"
-                />
+            <TextBox Grid.Row="3"
+                     x:Name="usernames_input"
+                     Height="35"
+                     Width="250"
+                     FontSize="14"
+                     TextAlignment="Center"
+                     HorizontalAlignment="Center"
+                     Margin="0,0,0,10"/>
 
-            <!-- button to submit name-->
-            <Button 
-                Height="40"
-                Width="270"
-                Margin="0,250,0,0"
-                Content="submit username"
-                Click="submit_name"
-                />
+            <TextBlock Grid.Row="4"
+                       x:Name="errorMessage"
+                       Text="Please enter your name"
+                       FontSize="12"
+                       Foreground="#E74C3C"
+                       HorizontalAlignment="Center"
+                       Visibility="Collapsed"/>
 
+            <Button Grid.Row="5"
+                    Content="Continue"
+                    Height="35"
+                    Width="150"
+                    Background="#3498DB"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="submit_name"
+                    HorizontalAlignment="Center"
+                    Margin="0,10,0,30"/>
         </Grid>
-        <!-- end of username grid-->
 
+        <!-- CHAT GRID -->
+        <Grid x:Name="chat_grid" Visibility="Hidden" Background="#ECF0F1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
+            <!-- Header -->
+            <Border Grid.Row="0" Background="#2C3E50" Padding="10">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/logo.jpeg" Height="30" Width="30" Margin="0,0,10,0"/>
+                    <TextBlock x:Name="botNameDisplay" 
+                               Text="jordan" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               Foreground="#2ECC71"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Chat Area -->
+            <ListBox x:Name="chats" 
+                     Grid.Row="1"
+                     Background="#ECF0F1"
+                     BorderThickness="0"/>
+
+            <!-- Input Area -->
+            <Border Grid.Row="2" Background="White" BorderBrush="#BDC3C7" BorderThickness="0,1,0,0" Padding="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="question" 
+                             Grid.Column="0"
+                             Height="40"
+                             FontSize="14"
+                             VerticalContentAlignment="Center"
+                             KeyDown="question_KeyDown"/>
+
+                    <Button Grid.Column="1"
+                            Content="Send"
+                            Height="35"
+                            Width="70"
+                            Margin="10,0,0,0"
+                            Background="#2ECC71"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="send"/>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
-    <!-- end of parent-->
 </Window>
