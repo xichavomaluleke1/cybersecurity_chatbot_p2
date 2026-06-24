@@ -28,9 +28,9 @@ namespace cybersecurity_chatbot_p2.Models
             return $"[{ActionTimestamp:yyyy-MM-dd HH:mm}] {ActionType}: {ActionDescription}";
         }
 
-        public string ToShortString()
+        public string GetFormattedEntry(int index)
         {
-            return $"{ActionType}: {ActionDescription}";
+            return $"{index}. {this.ToString()}";
         }
     }
 }
