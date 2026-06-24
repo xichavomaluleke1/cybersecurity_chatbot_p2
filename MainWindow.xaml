@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:cybersecurity_chatbot_p2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="550" Width="900">
     <Grid>
         <!-- HOME GRID -->
         <Grid x:Name="home_grid" Visibility="Visible" Background="#2C3E50">
@@ -114,57 +114,181 @@
         </Grid>
 
         <!-- CHAT GRID -->
-        <Grid x:Name="chat_grid" Visibility="Hidden" Background="#ECF0F1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <Grid x:Name="chat_grid" Visibility="Hidden">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- Header -->
-            <Border Grid.Row="0" Background="#2C3E50" Padding="10">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/logo.jpeg" Height="30" Width="30" Margin="0,0,10,0"/>
-                    <TextBlock x:Name="botNameDisplay" 
-                               Text="jordan" 
-                               FontSize="16" 
-                               FontWeight="Bold" 
-                               Foreground="#2ECC71"
-                               VerticalAlignment="Center"/>
-                </StackPanel>
-            </Border>
+            <Grid Grid.Column="0" Background="#ECF0F1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <!-- Chat Area -->
-            <ListBox x:Name="chats" 
-                     Grid.Row="1"
-                     Background="#ECF0F1"
-                     BorderThickness="0"/>
+                <!-- Header -->
+                <Border Grid.Row="0" Background="#2C3E50" Padding="10">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/logo.jpeg" Height="30" Width="30" Margin="0,0,10,0"/>
+                        <TextBlock x:Name="botNameDisplay" 
+                                   Text="jordan" 
+                                   FontSize="16" 
+                                   FontWeight="Bold" 
+                                   Foreground="#2ECC71"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
 
-            <!-- Input Area -->
-            <Border Grid.Row="2" Background="White" BorderBrush="#BDC3C7" BorderThickness="0,1,0,0" Padding="10">
+                <!-- Chat Area -->
+                <ListBox x:Name="chats" 
+                         Grid.Row="1"
+                         Background="#ECF0F1"
+                         BorderThickness="0"/>
+
+                <!-- Input Area -->
+                <Border Grid.Row="2" Background="White" BorderBrush="#BDC3C7" BorderThickness="0,1,0,0" Padding="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="question" 
+                                 Grid.Column="0"
+                                 Height="40"
+                                 FontSize="14"
+                                 VerticalContentAlignment="Center"
+                                 KeyDown="question_KeyDown"/>
+
+                        <Button Grid.Column="1"
+                                Content="Send"
+                                Height="35"
+                                Width="70"
+                                Margin="10,0,0,0"
+                                Background="#2ECC71"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Click="send"/>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Task Panel -->
+            <Border Grid.Column="1" Background="#2C3E50" Padding="10">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <TextBox x:Name="question" 
-                             Grid.Column="0"
-                             Height="40"
-                             FontSize="14"
-                             VerticalContentAlignment="Center"
-                             KeyDown="question_KeyDown"/>
+                    <!-- Task Panel Header -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                        <TextBlock Text="MY TASKS" 
+                                   FontSize="14" FontWeight="Bold"
+                                   Foreground="White"/>
+                        <TextBlock x:Name="TaskCountDisplay" 
+                                   Text="0 pending, 0 completed" 
+                                   FontSize="11"
+                                   Foreground="#888"/>
+                    </StackPanel>
 
-                    <Button Grid.Column="1"
-                            Content="Send"
-                            Height="35"
-                            Width="70"
-                            Margin="10,0,0,0"
-                            Background="#2ECC71"
-                            Foreground="White"
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            Click="send"/>
+                    <!-- Add Task Section -->
+                    <Border Grid.Row="1" Background="#1A1A2E" CornerRadius="8" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="Add New Task" 
+                                       Foreground="#00B4D8"
+                                       FontWeight="Bold" Margin="0,0,0,5"/>
+
+                            <TextBox x:Name="TaskTitleBox" Grid.Row="1"
+                                     Background="#2C3E50" Foreground="White"
+                                     BorderThickness="1" BorderBrush="#00B4D8"
+                                     Padding="8" Margin="0,0,0,5"
+                                     Text="Enter task title..."/>
+
+                            <TextBox x:Name="TaskDescriptionBox" Grid.Row="2"
+                                     Background="#2C3E50" Foreground="White"
+                                     BorderThickness="1" BorderBrush="#00B4D8"
+                                     Padding="8" Margin="0,0,0,5"
+                                     Text="Enter description..."/>
+
+                            <Grid Grid.Row="3" Margin="0,5,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox x:Name="SetReminderCheck" Grid.Column="0"
+                                          Content="Set Reminder" 
+                                          Foreground="White"
+                                          Checked="SetReminderCheck_Checked"
+                                          Unchecked="SetReminderCheck_Unchecked"/>
+
+                                <DatePicker x:Name="ReminderDatePicker" Grid.Column="1"
+                                            Width="120" Height="25"
+                                            Visibility="Collapsed"/>
+                            </Grid>
+
+                            <Button x:Name="AddTaskButton" Grid.Row="4"
+                                    Content="Add Task" 
+                                    Background="#2ECC71"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Height="30"
+                                    Margin="0,10,0,0"
+                                    Click="AddTaskButton_Click"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Task List -->
+                    <ListBox x:Name="TasksListBox" Grid.Row="2"
+                             Background="Transparent" 
+                             BorderThickness="0"
+                             Margin="0,10,0,0"
+                             SelectionChanged="TasksListBox_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#1A1A2E" CornerRadius="5" Margin="0,2">
+                                    <TextBlock Text="{Binding}" 
+                                               TextWrapping="Wrap"
+                                               Foreground="White"
+                                               FontSize="12"
+                                               Padding="8"/>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!-- Task Action Buttons -->
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" 
+                                Margin="0,10,0,0" HorizontalAlignment="Center">
+                        <Button x:Name="CompleteTaskButton" Content="Complete" 
+                                Background="#2ECC71" Foreground="White"
+                                BorderThickness="0" Height="30" Width="80"
+                                Click="CompleteTaskButton_Click"
+                                Margin="0,0,5,0"/>
+
+                        <Button x:Name="DeleteTaskButton" Content="Delete" 
+                                Background="#E74C3C" Foreground="White"
+                                BorderThickness="0" Height="30" Width="80"
+                                Click="DeleteTaskButton_Click"
+                                Margin="0,0,5,0"/>
+
+                        <Button x:Name="RefreshTasksButton" Content="Refresh" 
+                                Background="#3498DB" Foreground="White"
+                                BorderThickness="0" Height="30" Width="80"
+                                Click="RefreshTasksButton_Click"/>
+                    </StackPanel>
                 </Grid>
             </Border>
         </Grid>

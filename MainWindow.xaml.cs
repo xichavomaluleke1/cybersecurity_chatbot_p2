@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using cybersecurity_chatbot_p2.Models;
 
 namespace cybersecurity_chatbot_p2
 {
@@ -23,12 +24,14 @@ namespace cybersecurity_chatbot_p2
         private response_handler handler;
         private topic_detector detector;
         private sentiment_detector sentimentDetector;
+        private task_manager taskManager;
 
         // Variables
         private string username = string.Empty;
         private string currentTopic = string.Empty;
         private int messageCount = 0;
         private Random random = new Random();
+        private TaskModel selectedTask = null;
 
         public MainWindow()
         {
@@ -42,6 +45,9 @@ namespace cybersecurity_chatbot_p2
             handler = new response_handler(reply, ignore);
             detector = new topic_detector();
             sentimentDetector = new sentiment_detector(reply, finder);
+
+            // Initialize Task Manager
+            taskManager = new task_manager();
 
             // Play voice greeting
             new voice_greeting();
@@ -85,6 +91,9 @@ namespace cybersecurity_chatbot_p2
 
             // Recall previous interests
             RecallUserInterests();
+
+            // Load tasks
+            LoadTasksUI();
         }
 
         private bool IsExistingUser(string name)
@@ -119,6 +128,24 @@ namespace cybersecurity_chatbot_p2
         {
             string cleanInput = RemoveSpecialCharacters(input);
 
+            // ============= TASK MANAGER PROCESSING =============
+            if (taskManager != null)
+            {
+                string taskResponse = taskManager.ProcessTaskInput(input);
+                if (taskResponse != null)
+                {
+                    if (taskManager.IsWaitingForReminder())
+                    {
+                        AddMessage("jordan", taskResponse);
+                        return;
+                    }
+
+                    AddMessage("jordan", taskResponse);
+                    LoadTasksUI();
+                    return;
+                }
+            }
+
             // Check for sentiment
             string sentiment = sentimentDetector.DetectSentiment(cleanInput);
             if (sentiment != "neutral")
@@ -145,7 +172,6 @@ namespace cybersecurity_chatbot_p2
                 string response = finder.GetResponseByTopic(detectedTopic);
                 AddMessage("jordan", response);
 
-                // Save interest if user shows interest
                 if (cleanInput.Contains("interested in") || cleanInput.Contains("like learning"))
                 {
                     SaveUserInterest(detectedTopic);
@@ -283,6 +309,147 @@ namespace cybersecurity_chatbot_p2
         {
             if (e.Key == Key.Enter)
                 send(sender, null);
+        }
+
+        // ============= TASK UI METHODS =============
+
+        private void LoadTasksUI()
+        {
+            if (taskManager != null)
+            {
+                var tasks = taskManager.GetTasks();
+                TasksListBox.Items.Clear();
+
+                if (tasks.Count == 0)
+                {
+                    TasksListBox.Items.Add("No tasks found.");
+                }
+                else
+                {
+                    foreach (var task in tasks)
+                    {
+                        TasksListBox.Items.Add(task.GetDisplayString());
+                    }
+                }
+
+                TaskCountDisplay.Text = $"{taskManager.GetPendingCount()} pending, {taskManager.GetCompletedCount()} completed";
+            }
+        }
+
+        private void TasksListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (TasksListBox.SelectedIndex >= 0 && taskManager != null)
+            {
+                var tasks = taskManager.GetTasks();
+                if (TasksListBox.SelectedIndex < tasks.Count)
+                {
+                    selectedTask = tasks[TasksListBox.SelectedIndex];
+                }
+            }
+        }
+
+        private void AddTaskButton_Click(object sender, RoutedEventArgs e)
+        {
+            string title = TaskTitleBox.Text.Trim();
+            string description = TaskDescriptionBox.Text.Trim();
+
+            if (string.IsNullOrEmpty(title) || title == "Enter task title...")
+            {
+                MessageBox.Show("Please enter a task title.", "Missing Info", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            DateTime? reminderDate = null;
+            if (SetReminderCheck.IsChecked == true && ReminderDatePicker.SelectedDate.HasValue)
+            {
+                reminderDate = ReminderDatePicker.SelectedDate.Value;
+            }
+
+            if (taskManager != null && taskManager.AddTaskFromUI(title, description, reminderDate))
+            {
+                AddMessage("jordan", $"Task '{title}' added successfully!");
+                LoadTasksUI();
+
+                TaskTitleBox.Text = "Enter task title...";
+                TaskDescriptionBox.Text = "Enter description...";
+                SetReminderCheck.IsChecked = false;
+                ReminderDatePicker.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                AddMessage("jordan", "Failed to add task. Please try again.");
+            }
+        }
+
+        private void CompleteTaskButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedTask == null)
+            {
+                AddMessage("jordan", "Please select a task to complete.");
+                return;
+            }
+
+            if (selectedTask.TaskStatus == "Completed")
+            {
+                AddMessage("jordan", $"Task '{selectedTask.TaskName}' is already completed.");
+                return;
+            }
+
+            if (taskManager != null && taskManager.CompleteTaskFromUI(selectedTask.TaskId))
+            {
+                AddMessage("jordan", $"Task '{selectedTask.TaskName}' marked as completed!");
+                LoadTasksUI();
+                selectedTask = null;
+            }
+            else
+            {
+                AddMessage("jordan", "Failed to complete task. Please try again.");
+            }
+        }
+
+        private void DeleteTaskButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedTask == null)
+            {
+                AddMessage("jordan", "Please select a task to delete.");
+                return;
+            }
+
+            var result = MessageBox.Show($"Delete task '{selectedTask.TaskName}'?",
+                                        "Confirm Delete",
+                                        MessageBoxButton.YesNo,
+                                        MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (taskManager != null && taskManager.DeleteTaskFromUI(selectedTask.TaskId))
+                {
+                    AddMessage("jordan", $"Task '{selectedTask.TaskName}' deleted.");
+                    LoadTasksUI();
+                    selectedTask = null;
+                }
+                else
+                {
+                    AddMessage("jordan", "Failed to delete task. Please try again.");
+                }
+            }
+        }
+
+        private void RefreshTasksButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoadTasksUI();
+            AddMessage("jordan", "Task list refreshed.");
+        }
+
+        private void SetReminderCheck_Checked(object sender, RoutedEventArgs e)
+        {
+            ReminderDatePicker.Visibility = Visibility.Visible;
+            ReminderDatePicker.SelectedDate = DateTime.Now.AddDays(7);
+        }
+
+        private void SetReminderCheck_Unchecked(object sender, RoutedEventArgs e)
+        {
+            ReminderDatePicker.Visibility = Visibility.Collapsed;
         }
     }
 }
