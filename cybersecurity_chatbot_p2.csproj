@@ -55,8 +55,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ActivityLogEntry.cs" />
     <Compile Include="database_helper.cs" />
     <Compile Include="message_displayer.cs" />
+    <Compile Include="nlp_processor.cs" />
     <Compile Include="QuizQuestion.cs" />
     <Compile Include="quiz_manager.cs" />
     <Compile Include="respond.cs" />

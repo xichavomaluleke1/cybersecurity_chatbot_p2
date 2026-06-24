@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,7 @@ namespace cybersecurity_chatbot_p2
         private sentiment_detector sentimentDetector;
         private task_manager taskManager;
         private quiz_manager quizManager;
+        private nlp_processor nlpProcessor;
 
         // Variables
         private string username = string.Empty;
@@ -33,6 +35,7 @@ namespace cybersecurity_chatbot_p2
         private int messageCount = 0;
         private Random random = new Random();
         private TaskModel selectedTask = null;
+        private List<ActivityLogEntry> activityLog;
 
         public MainWindow()
         {
@@ -52,6 +55,12 @@ namespace cybersecurity_chatbot_p2
 
             // Initialize Quiz Manager
             quizManager = new quiz_manager();
+
+            // Initialize NLP Processor
+            nlpProcessor = new nlp_processor();
+
+            // Initialize Activity Log
+            activityLog = new List<ActivityLogEntry>();
 
             // Subscribe to quiz events
             quizManager.OnQuestionDisplayed += (message) =>
@@ -78,11 +87,45 @@ namespace cybersecurity_chatbot_p2
                 {
                     QuizScoreDisplay.Text = $"Score: {score}/{total}";
                     UpdateQuizProgress();
+                    LogActivity("Quiz", $"Quiz completed with score {score}/{total}");
                 });
             };
 
             // Play voice greeting
             new voice_greeting();
+
+            // Log startup
+            LogActivity("System", "Chatbot started");
+        }
+
+        // ============= ACTIVITY LOG METHODS =============
+
+        private void LogActivity(string actionType, string description)
+        {
+            var entry = new ActivityLogEntry(actionType, description, username);
+            activityLog.Insert(0, entry);
+
+            // Keep only last 50 entries
+            while (activityLog.Count > 50)
+            {
+                activityLog.RemoveAt(activityLog.Count - 1);
+            }
+        }
+
+        private string GetActivityLogSummary()
+        {
+            int count = Math.Min(10, activityLog.Count);
+            if (count == 0)
+            {
+                return "No activities have been logged yet.";
+            }
+
+            string summary = "Here is a summary of recent actions:\n";
+            for (int i = 0; i < count; i++)
+            {
+                summary += $"{i + 1}. {activityLog[i]}\n";
+            }
+            return summary;
         }
 
         // ============= NAVIGATION METHODS =============
@@ -110,6 +153,7 @@ namespace cybersecurity_chatbot_p2
             string response = quizManager.StartQuiz();
             QuizScoreDisplay.Text = "Score: 0/0";
             AddMessage("jordan", response);
+            LogActivity("Quiz", "Quiz started");
 
             if (quizManager.TotalQuestions > 0)
             {
@@ -181,6 +225,9 @@ namespace cybersecurity_chatbot_p2
 
             // Load tasks
             LoadTasksUI();
+
+            // Log user login
+            LogActivity("User", $"User {username} logged in");
         }
 
         private bool IsExistingUser(string name)
@@ -215,20 +262,88 @@ namespace cybersecurity_chatbot_p2
         {
             string cleanInput = RemoveSpecialCharacters(input);
 
-            // ============= QUIZ PROCESSING (Priority) =============
+            // ============= NLP PROCESSING =============
+            if (nlpProcessor != null)
+            {
+                string nlpResult = nlpProcessor.ProcessNaturalLanguage(input, taskManager, quizManager, username);
+
+                if (nlpResult != null)
+                {
+                    // Handle different NLP intents
+                    if (nlpResult == "quiz")
+                    {
+                        string response = quizManager.StartQuiz();
+                        if (response != null)
+                        {
+                            AddMessage("jordan", response);
+                            LogActivity("Quiz", "Quiz started via NLP");
+                            QuizScoreDisplay.Text = "Score: 0/0";
+                            if (quizManager.TotalQuestions > 0)
+                            {
+                                QuizProgressBar.Maximum = quizManager.TotalQuestions;
+                            }
+                            UpdateQuizProgress();
+                            return;
+                        }
+                    }
+                    else if (nlpResult == "log")
+                    {
+                        string logSummary = nlpProcessor.GetLogSummary(activityLog);
+                        AddMessage("jordan", logSummary);
+                        return;
+                    }
+                    else if (nlpResult.StartsWith("complete:"))
+                    {
+                        string taskName = nlpResult.Substring(9).Trim();
+                        if (!string.IsNullOrEmpty(taskName) && taskName.Length > 2)
+                        {
+                            HandleTaskCompletionByName(taskName);
+                            return;
+                        }
+                        else
+                        {
+                            AddMessage("jordan", "Which task would you like to complete? Please specify the task name.");
+                            return;
+                        }
+                    }
+                    else if (nlpResult.StartsWith("delete:"))
+                    {
+                        string taskName = nlpResult.Substring(7).Trim();
+                        if (!string.IsNullOrEmpty(taskName) && taskName.Length > 2)
+                        {
+                            HandleTaskDeletionByName(taskName);
+                            return;
+                        }
+                        else
+                        {
+                            AddMessage("jordan", "Which task would you like to delete? Please specify the task name.");
+                            return;
+                        }
+                    }
+                    else if (nlpResult.StartsWith("reminder:"))
+                    {
+                        HandleReminderNLP(nlpResult);
+                        return;
+                    }
+                    else if (!string.IsNullOrEmpty(nlpResult))
+                    {
+                        // This is a task creation from NLP
+                        HandleTaskCreationNLP(nlpResult);
+                        return;
+                    }
+                }
+            }
+
+            // ============= QUIZ PROCESSING =============
             if (quizManager != null)
             {
-                // Check if quiz is active or user wants to start quiz
-                if (quizManager.IsQuizActive || input.ToLower().Contains("start quiz") ||
-                    input.ToLower().Contains("take quiz") || input.ToLower().Contains("play quiz") ||
-                    input.ToLower().Contains("quiz me"))
+                if (quizManager.IsQuizActive)
                 {
                     string quizResponse = quizManager.ProcessQuizInput(input);
                     if (quizResponse != null)
                     {
                         AddMessage("jordan", quizResponse);
 
-                        // Update quiz score in UI
                         if (quizManager.IsQuizActive)
                         {
                             QuizScoreDisplay.Text = $"Score: {quizManager.CurrentScore}/{quizManager.CurrentQuestionNumber}";
@@ -268,6 +383,7 @@ namespace cybersecurity_chatbot_p2
             {
                 string response = sentimentDetector.GetSentimentResponse(sentiment);
                 AddMessage("jordan", response);
+                LogActivity("Sentiment", $"User expressed {sentiment} sentiment");
                 return;
             }
 
@@ -275,7 +391,16 @@ namespace cybersecurity_chatbot_p2
             if (handler.IsFollowUpRequest(cleanInput) && !string.IsNullOrEmpty(currentTopic))
             {
                 string response = finder.GetResponseByTopic(currentTopic);
-                AddMessage("jordan", $"Here's more about {currentTopic}:\n\n{response}");
+                AddMessage("jordan", $"Here is more about {currentTopic}:\n\n{response}");
+                LogActivity("Follow-up", $"User asked for more about {currentTopic}");
+                return;
+            }
+
+            // Check for help
+            if (cleanInput.Contains("help") || cleanInput.Contains("what can you do"))
+            {
+                string helpResponse = nlpProcessor.GetHelpResponse();
+                AddMessage("jordan", helpResponse);
                 return;
             }
 
@@ -292,20 +417,153 @@ namespace cybersecurity_chatbot_p2
                 {
                     SaveUserInterest(detectedTopic);
                 }
+
+                LogActivity("Topic", $"User asked about {detectedTopic}");
             }
             else
             {
-                string[] defaults = {
-                    "I'm not sure I understand. Try asking about passwords, scams, or privacy.",
-                    "Hmm, can you rephrase that? I can help with cybersecurity topics.",
-                    "I don't recognize that. Ask me about online safety and security tips.",
-                    "You can also type 'start quiz' to test your cybersecurity knowledge!"
-                };
-                AddMessage("jordan", defaults[random.Next(defaults.Length)]);
+                // Use NLP default response instead of generic error
+                string defaultResponse = nlpProcessor.GetDefaultResponse();
+                AddMessage("jordan", defaultResponse);
+                LogActivity("Unknown", "User input not recognized");
             }
 
             messageCount++;
         }
+
+        // ============= NLP HELPER METHODS =============
+
+        private void HandleTaskCreationNLP(string taskName)
+        {
+            // Add task through NLP
+            if (taskManager != null)
+            {
+                // Check if task already exists
+                var existingTasks = taskManager.GetTasks();
+                foreach (var task in existingTasks)
+                {
+                    if (task.TaskName.ToLower() == taskName.ToLower())
+                    {
+                        AddMessage("jordan", $"A task with the name '{taskName}' already exists. Would you like to create a different task?");
+                        return;
+                    }
+                }
+
+                // Create the task
+                if (taskManager.AddTaskFromUI(taskName, "Created via NLP", null))
+                {
+                    AddMessage("jordan", $"Task '{taskName}' added successfully! Would you like to set a reminder for this task?");
+                    LoadTasksUI();
+                    LogActivity("Task", $"Task '{taskName}' added via NLP");
+                }
+                else
+                {
+                    AddMessage("jordan", "Failed to add task. Please try again.");
+                }
+            }
+        }
+
+        private void HandleReminderNLP(string reminderInfo)
+        {
+            string[] parts = reminderInfo.Split('|');
+            string reminderText = parts[0].Replace("reminder:", "");
+            string dateInfo = parts.Length > 1 ? parts[1] : null;
+
+            // Check if there's a task with this name
+            if (taskManager != null)
+            {
+                var tasks = taskManager.GetTasks();
+                bool taskFound = false;
+
+                foreach (var task in tasks)
+                {
+                    if (task.TaskName.ToLower().Contains(reminderText.ToLower()))
+                    {
+                        taskFound = true;
+                        string reminderDate = dateInfo ?? DateTime.Now.AddDays(7).ToString("MMM dd, yyyy");
+                        AddMessage("jordan", $"Reminder set for '{task.TaskName}' on {reminderDate}");
+                        LogActivity("Reminder", $"Reminder set for task '{task.TaskName}' on {reminderDate}");
+                        return;
+                    }
+                }
+
+                if (!taskFound)
+                {
+                    // Create a new task with the reminder
+                    string reminderDate = dateInfo ?? DateTime.Now.AddDays(7).ToString("MMM dd, yyyy");
+                    if (taskManager.AddTaskFromUI(reminderText, $"Reminder task", DateTime.Parse(reminderDate)))
+                    {
+                        AddMessage("jordan", $"Task '{reminderText}' added with reminder for {reminderDate}!");
+                        LoadTasksUI();
+                        LogActivity("Task", $"Task '{reminderText}' added with reminder via NLP");
+                    }
+                    else
+                    {
+                        AddMessage("jordan", "Failed to add task with reminder. Please try again.");
+                    }
+                }
+            }
+        }
+
+        private void HandleTaskCompletionByName(string taskName)
+        {
+            if (taskManager != null)
+            {
+                var tasks = taskManager.GetTasks();
+                bool taskFound = false;
+
+                foreach (var task in tasks)
+                {
+                    if (task.TaskName.ToLower().Contains(taskName.ToLower()) && task.TaskStatus == "Pending")
+                    {
+                        if (taskManager.CompleteTaskFromUI(task.TaskId))
+                        {
+                            AddMessage("jordan", $"Task '{task.TaskName}' marked as completed!");
+                            LoadTasksUI();
+                            LogActivity("Task", $"Task '{task.TaskName}' completed via NLP");
+                            taskFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!taskFound)
+                {
+                    AddMessage("jordan", $"Could not find a pending task matching '{taskName}'. Please check the task name and try again.");
+                }
+            }
+        }
+
+        private void HandleTaskDeletionByName(string taskName)
+        {
+            if (taskManager != null)
+            {
+                var tasks = taskManager.GetTasks();
+                bool taskFound = false;
+
+                foreach (var task in tasks)
+                {
+                    if (task.TaskName.ToLower().Contains(taskName.ToLower()))
+                    {
+                        if (taskManager.DeleteTaskFromUI(task.TaskId))
+                        {
+                            AddMessage("jordan", $"Task '{task.TaskName}' deleted.");
+                            LoadTasksUI();
+                            LogActivity("Task", $"Task '{task.TaskName}' deleted via NLP");
+                            taskFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!taskFound)
+                {
+                    AddMessage("jordan", $"Could not find a task matching '{taskName}'. Please check the task name and try again.");
+                }
+            }
+        }
+
+        // ============= EXISTING METHODS (Unchanged) =============
 
         private void AddMessage(string sender, string message)
         {
@@ -398,7 +656,7 @@ namespace cybersecurity_chatbot_p2
                     if (line.StartsWith(username + ":"))
                     {
                         string interests = line.Substring(line.IndexOf(":") + 1);
-                        AddMessage("jordan", $"I remember you're interested in {interests}. Want to learn more?");
+                        AddMessage("jordan", $"I remember you are interested in {interests}. Want to learn more?");
                         break;
                     }
                 }
@@ -486,6 +744,7 @@ namespace cybersecurity_chatbot_p2
             {
                 AddMessage("jordan", $"Task '{title}' added successfully!");
                 LoadTasksUI();
+                LogActivity("Task", $"Task '{title}' added via UI");
 
                 TaskTitleBox.Text = "Enter task title...";
                 TaskDescriptionBox.Text = "Enter description...";
@@ -516,6 +775,7 @@ namespace cybersecurity_chatbot_p2
             {
                 AddMessage("jordan", $"Task '{selectedTask.TaskName}' marked as completed!");
                 LoadTasksUI();
+                LogActivity("Task", $"Task '{selectedTask.TaskName}' completed via UI");
                 selectedTask = null;
             }
             else
@@ -543,6 +803,7 @@ namespace cybersecurity_chatbot_p2
                 {
                     AddMessage("jordan", $"Task '{selectedTask.TaskName}' deleted.");
                     LoadTasksUI();
+                    LogActivity("Task", $"Task '{selectedTask.TaskName}' deleted via UI");
                     selectedTask = null;
                 }
                 else
