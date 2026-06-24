@@ -117,8 +117,6 @@ namespace cybersecurity_chatbot_p2
             LogActivity("System", "Activity log cleared");
         }
 
-        // ============= CONVENIENCE METHODS =============
-
         public void LogTaskAdded(string taskName)
         {
             LogActivity("Task", $"Task added: '{taskName}'");
@@ -147,11 +145,6 @@ namespace cybersecurity_chatbot_p2
         public void LogQuizCompleted(int score, int total)
         {
             LogActivity("Quiz", $"Quiz completed with score {score}/{total}");
-        }
-
-        public void LogNLPInteraction(string userInput, string intent)
-        {
-            LogActivity("NLP", $"Intent '{intent}' detected from: '{userInput}'");
         }
 
         public void LogSentimentDetected(string sentiment)

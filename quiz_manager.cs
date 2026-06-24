@@ -13,7 +13,6 @@ namespace cybersecurity_chatbot_p2
         private int score;
         private bool isQuizActive;
         private Random random;
-        private string currentAnswer = "";
 
         public event Action<string> OnQuestionDisplayed;
         public event Action<string> OnFeedbackGiven;
@@ -38,7 +37,6 @@ namespace cybersecurity_chatbot_p2
         {
             questions = new List<QuizQuestion>();
 
-            // Question 1: Password Safety (Multiple Choice)
             questions.Add(new QuizQuestion
             {
                 QuestionId = 1,
@@ -51,11 +49,10 @@ namespace cybersecurity_chatbot_p2
                     "Use only numbers"
                 },
                 CorrectAnswerIndex = 1,
-                Explanation = "A strong password should be at least 12 characters long and use a mix of uppercase, lowercase, numbers, and special symbols. This makes it harder for hackers to crack.",
+                Explanation = "A strong password should be at least 12 characters long and use a mix of uppercase, lowercase, numbers, and special symbols.",
                 Topic = "Password Safety"
             });
 
-            // Question 2: Phishing (Multiple Choice)
             questions.Add(new QuizQuestion
             {
                 QuestionId = 2,
@@ -68,11 +65,10 @@ namespace cybersecurity_chatbot_p2
                     "Ignore it"
                 },
                 CorrectAnswerIndex = 2,
-                Explanation = "Reporting phishing emails helps prevent scams. Legitimate companies will never ask for your password via email. Always report suspicious emails to your IT department or email provider.",
+                Explanation = "Reporting phishing emails helps prevent scams. Legitimate companies will never ask for your password via email.",
                 Topic = "Phishing"
             });
 
-            // Question 3: Safe Browsing (True/False)
             questions.Add(new QuizQuestion
             {
                 QuestionId = 3,
@@ -80,11 +76,10 @@ namespace cybersecurity_chatbot_p2
                 QuestionType = "TrueFalse",
                 Options = new List<string> { "True", "False" },
                 CorrectAnswerIndex = 1,
-                Explanation = "Public Wi-Fi networks are often unencrypted, making it easy for hackers to intercept your data. Always use a VPN when accessing sensitive information on public networks.",
+                Explanation = "Public Wi-Fi networks are often unencrypted, making it easy for hackers to intercept your data.",
                 Topic = "Safe Browsing"
             });
 
-            // Question 4: Social Engineering (Multiple Choice)
             questions.Add(new QuizQuestion
             {
                 QuestionId = 4,
@@ -97,11 +92,10 @@ namespace cybersecurity_chatbot_p2
                     "Writing social media posts"
                 },
                 CorrectAnswerIndex = 1,
-                Explanation = "Social engineering is the psychological manipulation of people to divulge confidential information. Attackers exploit human trust rather than technical vulnerabilities.",
+                Explanation = "Social engineering is the psychological manipulation of people to divulge confidential information.",
                 Topic = "Social Engineering"
             });
 
-            // Question 5: Two-Factor Authentication (True/False)
             questions.Add(new QuizQuestion
             {
                 QuestionId = 5,
@@ -109,11 +103,10 @@ namespace cybersecurity_chatbot_p2
                 QuestionType = "TrueFalse",
                 Options = new List<string> { "True", "False" },
                 CorrectAnswerIndex = 0,
-                Explanation = "2FA adds a second verification step, such as a code sent to your phone. Even if your password is stolen, the attacker cannot access your account without the second factor.",
+                Explanation = "2FA adds a second verification step, such as a code sent to your phone.",
                 Topic = "Authentication"
             });
 
-            // Question 6: Malware (Multiple Choice)
             questions.Add(new QuizQuestion
             {
                 QuestionId = 6,
@@ -126,11 +119,10 @@ namespace cybersecurity_chatbot_p2
                     "Adware"
                 },
                 CorrectAnswerIndex = 1,
-                Explanation = "Ransomware encrypts your files and demands payment for the decryption key. Always back up your important files and avoid clicking suspicious links to prevent ransomware attacks.",
+                Explanation = "Ransomware encrypts your files and demands payment for the decryption key.",
                 Topic = "Malware"
             });
 
-            // Question 7: Phishing (True/False)
             questions.Add(new QuizQuestion
             {
                 QuestionId = 7,
@@ -138,31 +130,13 @@ namespace cybersecurity_chatbot_p2
                 QuestionType = "TrueFalse",
                 Options = new List<string> { "True", "False" },
                 CorrectAnswerIndex = 1,
-                Explanation = "Never click links from unknown senders, even if the offer seems legitimate. These links often lead to phishing sites that steal your personal information.",
+                Explanation = "Never click links from unknown senders. These links often lead to phishing sites.",
                 Topic = "Phishing"
             });
 
-            // Question 8: Password Safety (Multiple Choice)
             questions.Add(new QuizQuestion
             {
                 QuestionId = 8,
-                QuestionText = "What is a passphrase compared to a traditional password?",
-                QuestionType = "MultipleChoice",
-                Options = new List<string> {
-                    "It is shorter and easier to crack",
-                    "It is longer and uses multiple words, making it stronger",
-                    "It only uses numbers",
-                    "It is the same as a password"
-                },
-                CorrectAnswerIndex = 1,
-                Explanation = "A passphrase like 'PurpleElephantDancesAtMidnight' is longer and uses multiple words, making it both stronger and easier to remember than a complex password.",
-                Topic = "Password Safety"
-            });
-
-            // Question 9: Safe Browsing (Multiple Choice)
-            questions.Add(new QuizQuestion
-            {
-                QuestionId = 9,
                 QuestionText = "What should you look for to ensure a website is secure?",
                 QuestionType = "MultipleChoice",
                 Options = new List<string> {
@@ -172,26 +146,24 @@ namespace cybersecurity_chatbot_p2
                     "The website has many ads"
                 },
                 CorrectAnswerIndex = 1,
-                Explanation = "Always look for 'https://' and the padlock icon in the address bar. This indicates the connection is encrypted and your data is protected during transmission.",
+                Explanation = "Always look for 'https://' and the padlock icon in the address bar. This indicates the connection is encrypted.",
                 Topic = "Safe Browsing"
             });
 
-            // Question 10: Social Engineering (True/False)
             questions.Add(new QuizQuestion
             {
-                QuestionId = 10,
+                QuestionId = 9,
                 QuestionText = "It is safe to share your OTP (One-Time Password) with someone claiming to be from your bank.",
                 QuestionType = "TrueFalse",
                 Options = new List<string> { "True", "False" },
                 CorrectAnswerIndex = 1,
-                Explanation = "Never share your OTP with anyone. Legitimate banks will never ask for your OTP over the phone, email, or SMS. This is a common social engineering tactic.",
+                Explanation = "Never share your OTP with anyone. Legitimate banks will never ask for your OTP.",
                 Topic = "Social Engineering"
             });
 
-            // Question 11: Malware (Multiple Choice)
             questions.Add(new QuizQuestion
             {
-                QuestionId = 11,
+                QuestionId = 10,
                 QuestionText = "How can you protect your computer from malware?",
                 QuestionType = "MultipleChoice",
                 Options = new List<string> {
@@ -201,14 +173,13 @@ namespace cybersecurity_chatbot_p2
                     "Use only free software"
                 },
                 CorrectAnswerIndex = 1,
-                Explanation = "Keep your antivirus software updated and run regular scans. Also, only download software from official websites and avoid clicking suspicious links.",
+                Explanation = "Keep your antivirus software updated and run regular scans.",
                 Topic = "Malware"
             });
 
-            // Question 12: Privacy (Multiple Choice)
             questions.Add(new QuizQuestion
             {
-                QuestionId = 12,
+                QuestionId = 11,
                 QuestionText = "What is the best way to protect your privacy on social media?",
                 QuestionType = "MultipleChoice",
                 Options = new List<string> {
@@ -218,14 +189,13 @@ namespace cybersecurity_chatbot_p2
                     "Post your phone number"
                 },
                 CorrectAnswerIndex = 1,
-                Explanation = "Always review and adjust your privacy settings on social media. Limit who can see your posts, personal information, and contact details to protect your privacy.",
+                Explanation = "Always review and adjust your privacy settings on social media.",
                 Topic = "Privacy"
             });
 
-            // Question 13: South Africa Specific (Multiple Choice)
             questions.Add(new QuizQuestion
             {
-                QuestionId = 13,
+                QuestionId = 12,
                 QuestionText = "What is 'smishing' that is common in South Africa?",
                 QuestionType = "MultipleChoice",
                 Options = new List<string> {
@@ -235,14 +205,13 @@ namespace cybersecurity_chatbot_p2
                     "Two-factor authentication"
                 },
                 CorrectAnswerIndex = 1,
-                Explanation = "Smishing is SMS phishing where scammers send text messages pretending to be from banks like Capitec, FNB, or Standard Bank to steal your personal information.",
+                Explanation = "Smishing is SMS phishing where scammers send text messages pretending to be from banks.",
                 Topic = "South Africa"
             });
 
-            // Question 14: Two-Factor Authentication (Multiple Choice)
             questions.Add(new QuizQuestion
             {
-                QuestionId = 14,
+                QuestionId = 13,
                 QuestionText = "Which of the following is NOT a form of Two-Factor Authentication?",
                 QuestionType = "MultipleChoice",
                 Options = new List<string> {
@@ -252,20 +221,35 @@ namespace cybersecurity_chatbot_p2
                     "Biometric verification"
                 },
                 CorrectAnswerIndex = 2,
-                Explanation = "Security questions are not considered 2FA because they are just another form of 'something you know'. 2FA requires 'something you have' (phone, authenticator) or 'something you are' (biometrics).",
+                Explanation = "Security questions are not considered 2FA. 2FA requires 'something you have' or 'something you are'.",
                 Topic = "Authentication"
             });
 
-            // Question 15: Phishing (True/False)
             questions.Add(new QuizQuestion
             {
-                QuestionId = 15,
+                QuestionId = 14,
                 QuestionText = "Phishing emails often create a sense of urgency to trick you into acting quickly.",
                 QuestionType = "TrueFalse",
                 Options = new List<string> { "True", "False" },
                 CorrectAnswerIndex = 0,
-                Explanation = "Phishing emails often use urgent language like 'Your account will be closed' or 'Immediate action required' to rush you into making mistakes without thinking.",
+                Explanation = "Phishing emails often use urgent language to rush you into making mistakes.",
                 Topic = "Phishing"
+            });
+
+            questions.Add(new QuizQuestion
+            {
+                QuestionId = 15,
+                QuestionText = "What is a passphrase compared to a traditional password?",
+                QuestionType = "MultipleChoice",
+                Options = new List<string> {
+                    "It is shorter and easier to crack",
+                    "It is longer and uses multiple words, making it stronger",
+                    "It only uses numbers",
+                    "It is the same as a password"
+                },
+                CorrectAnswerIndex = 1,
+                Explanation = "A passphrase like 'PurpleElephantDancesAtMidnight' is longer and uses multiple words.",
+                Topic = "Password Safety"
             });
         }
 
@@ -276,7 +260,6 @@ namespace cybersecurity_chatbot_p2
                 return "No questions available. Please try again later.";
             }
 
-            // Shuffle questions
             shuffledQuestions = questions.OrderBy(x => random.Next()).ToList();
             currentQuestionIndex = 0;
             score = 0;
@@ -314,8 +297,6 @@ namespace cybersecurity_chatbot_p2
             }
 
             var question = shuffledQuestions[currentQuestionIndex];
-            currentAnswer = answer;
-
             bool isCorrect = question.IsCorrect(answer);
 
             if (isCorrect)
@@ -372,7 +353,6 @@ namespace cybersecurity_chatbot_p2
         {
             if (!isQuizActive)
             {
-                // Check if user wants to start quiz
                 string lowerInput = input.ToLower().Trim();
                 if (lowerInput.Contains("start quiz") || lowerInput.Contains("take quiz") ||
                     lowerInput.Contains("play quiz") || lowerInput.Contains("quiz me"))
@@ -382,7 +362,6 @@ namespace cybersecurity_chatbot_p2
                 return null;
             }
 
-            // User is in quiz - submit answer
             return SubmitAnswer(input);
         }
 

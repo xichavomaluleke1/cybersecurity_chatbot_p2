@@ -71,37 +71,31 @@ namespace cybersecurity_chatbot_p2
         {
             string lowerInput = input.ToLower().Trim();
 
-            // Check for quiz intent
             if (ContainsKeyword(lowerInput, quizKeywords))
             {
                 return "quiz";
             }
 
-            // Check for log/activity intent
             if (ContainsKeyword(lowerInput, logKeywords))
             {
                 return "log";
             }
 
-            // Check for task completion intent
             if (ContainsKeyword(lowerInput, completionKeywords))
             {
                 return ExtractTaskForAction(input, "complete");
             }
 
-            // Check for task deletion intent
             if (ContainsKeyword(lowerInput, deletionKeywords))
             {
                 return ExtractTaskForAction(input, "delete");
             }
 
-            // Check for reminder intent
             if (ContainsKeyword(lowerInput, reminderKeywords))
             {
                 return ExtractReminderInfo(input);
             }
 
-            // Check for task creation intent
             if (ContainsKeyword(lowerInput, taskKeywords))
             {
                 return ExtractTaskInfo(input);
@@ -125,9 +119,8 @@ namespace cybersecurity_chatbot_p2
         private string ExtractTaskInfo(string input)
         {
             string lowerInput = input.ToLower();
-
-            // Remove task creation keywords
             string taskText = input;
+
             foreach (string keyword in taskKeywords)
             {
                 if (lowerInput.Contains(keyword))
@@ -143,7 +136,6 @@ namespace cybersecurity_chatbot_p2
                 }
             }
 
-            // Remove action words
             foreach (string word in taskActionKeywords)
             {
                 if (taskText.ToLower().Contains(word))
@@ -159,7 +151,6 @@ namespace cybersecurity_chatbot_p2
                 }
             }
 
-            // Clean up extra spaces
             taskText = Regex.Replace(taskText, @"\s+", " ").Trim();
 
             if (string.IsNullOrEmpty(taskText) || taskText.Length < 2)
@@ -173,9 +164,8 @@ namespace cybersecurity_chatbot_p2
         private string ExtractReminderInfo(string input)
         {
             string lowerInput = input.ToLower();
-
-            // Remove reminder keywords
             string reminderText = input;
+
             foreach (string keyword in reminderKeywords)
             {
                 if (lowerInput.Contains(keyword))
@@ -191,7 +181,6 @@ namespace cybersecurity_chatbot_p2
                 }
             }
 
-            // Remove action words
             foreach (string word in taskActionKeywords)
             {
                 if (reminderText.ToLower().Contains(word))
@@ -207,10 +196,7 @@ namespace cybersecurity_chatbot_p2
                 }
             }
 
-            // Clean up extra spaces
             reminderText = Regex.Replace(reminderText, @"\s+", " ").Trim();
-
-            // Extract date if present
             string dateInfo = ExtractDate(input);
 
             if (!string.IsNullOrEmpty(reminderText) && reminderText.Length > 2)
@@ -229,19 +215,16 @@ namespace cybersecurity_chatbot_p2
         {
             string lowerInput = input.ToLower();
 
-            // Check for "tomorrow"
             if (lowerInput.Contains("tomorrow"))
             {
                 return DateTime.Now.AddDays(1).ToString("MMM dd, yyyy");
             }
 
-            // Check for "today"
             if (lowerInput.Contains("today"))
             {
                 return DateTime.Now.ToString("MMM dd, yyyy");
             }
 
-            // Check for "in X days"
             Match daysMatch = Regex.Match(lowerInput, @"in\s+(\d+)\s+days?");
             if (daysMatch.Success)
             {
@@ -249,7 +232,6 @@ namespace cybersecurity_chatbot_p2
                 return DateTime.Now.AddDays(days).ToString("MMM dd, yyyy");
             }
 
-            // Check for "in X weeks"
             Match weeksMatch = Regex.Match(lowerInput, @"in\s+(\d+)\s+weeks?");
             if (weeksMatch.Success)
             {
@@ -257,19 +239,16 @@ namespace cybersecurity_chatbot_p2
                 return DateTime.Now.AddDays(weeks * 7).ToString("MMM dd, yyyy");
             }
 
-            // Check for "next week"
             if (lowerInput.Contains("next week"))
             {
                 return DateTime.Now.AddDays(7).ToString("MMM dd, yyyy");
             }
 
-            // Check for "next month"
             if (lowerInput.Contains("next month"))
             {
                 return DateTime.Now.AddMonths(1).ToString("MMM dd, yyyy");
             }
 
-            // Try to parse any date format
             try
             {
                 Match dateMatch = Regex.Match(input, @"\d{4}-\d{2}-\d{2}|\d{2}/\d{2}/\d{4}|\d{2}-\d{2}-\d{4}");
@@ -281,7 +260,7 @@ namespace cybersecurity_chatbot_p2
             }
             catch
             {
-                // Ignore parse errors
+                // Ignore
             }
 
             return null;
@@ -290,8 +269,6 @@ namespace cybersecurity_chatbot_p2
         private string ExtractTaskForAction(string input, string action)
         {
             string lowerInput = input.ToLower();
-
-            // Remove action keywords
             string taskText = input;
             List<string> keywords = action == "complete" ? completionKeywords : deletionKeywords;
 
@@ -310,7 +287,6 @@ namespace cybersecurity_chatbot_p2
                 }
             }
 
-            // Remove action words
             foreach (string word in taskActionKeywords)
             {
                 if (taskText.ToLower().Contains(word))
@@ -326,7 +302,6 @@ namespace cybersecurity_chatbot_p2
                 }
             }
 
-            // Clean up extra spaces
             taskText = Regex.Replace(taskText, @"\s+", " ").Trim();
 
             if (!string.IsNullOrEmpty(taskText) && taskText.Length > 2)
@@ -335,25 +310,6 @@ namespace cybersecurity_chatbot_p2
             }
 
             return $"{action}";
-        }
-
-        public string GetLogSummary(List<ActivityLogEntry> activities)
-        {
-            if (activities == null || activities.Count == 0)
-            {
-                return "No activities have been logged yet.";
-            }
-
-            string summary = "Here is a summary of recent actions:\n";
-            int count = 1;
-
-            foreach (var activity in activities)
-            {
-                summary += $"{count}. {activity}\n";
-                count++;
-            }
-
-            return summary;
         }
 
         public string GetDefaultResponse()

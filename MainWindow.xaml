@@ -5,45 +5,176 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:cybersecurity_chatbot_p2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1000">
+        Title="Cybersecurity Chatbot" 
+        Height="700" Width="1100"
+        WindowStartupLocation="CenterScreen"
+        Background="#1A1A2E">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="PrimaryDark" Color="#1A1A2E"/>
+        <SolidColorBrush x:Key="SecondaryDark" Color="#16213E"/>
+        <SolidColorBrush x:Key="AccentBlue" Color="#00B4D8"/>
+        <SolidColorBrush x:Key="AccentGreen" Color="#2ECC71"/>
+        <SolidColorBrush x:Key="AccentOrange" Color="#F39C12"/>
+        <SolidColorBrush x:Key="AccentRed" Color="#E74C3C"/>
+        <SolidColorBrush x:Key="ChatBg" Color="#ECF0F1"/>
+        <SolidColorBrush x:Key="UserBubbleColor" Color="#3498DB"/>
+        <SolidColorBrush x:Key="BotBubbleColor" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="CardBg" Color="#2C3E50"/>
+
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentBlue}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.85"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Opacity" Value="0.7"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TabButton" TargetType="Button">
+            <Setter Property="Foreground" Value="#888"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ActiveTabButton" TargetType="Button" BasedOn="{StaticResource TabButton}">
+            <Setter Property="Foreground" Value="{StaticResource AccentBlue}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBlue}"/>
+        </Style>
+
+        <Style x:Key="ListItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3D566E"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#00B4D8"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ChatBubbleStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="MaxWidth" Value="500"/>
+        </Style>
+
+        <Style x:Key="UserBubbleStyle" TargetType="Border" BasedOn="{StaticResource ChatBubbleStyle}">
+            <Setter Property="Background" Value="{StaticResource UserBubbleColor}"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="50,3,10,3"/>
+        </Style>
+
+        <Style x:Key="BotBubbleStyle" TargetType="Border" BasedOn="{StaticResource ChatBubbleStyle}">
+            <Setter Property="Background" Value="{StaticResource BotBubbleColor}"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="10,3,50,3"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        <!-- HOME GRID -->
-        <Grid x:Name="home_grid" Visibility="Visible" Background="#2C3E50">
+        <Grid x:Name="home_grid" Visibility="Visible" Background="{StaticResource PrimaryDark}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Image Grid.Row="0"
-                   Source="/logo.jpeg" 
-                   Height="150"
-                   Width="150"
-                   HorizontalAlignment="Center"
-                   Margin="0,30,0,10"/>
-
-            <TextBlock Grid.Row="1"
-                       Text="Cybersecurity Awareness Chatbot"
-                       FontSize="18"
-                       FontWeight="Bold"
-                       Foreground="White"
-                       HorizontalAlignment="Center"
-                       Margin="0,20,0,10"/>
-
-            <TextBlock Grid.Row="2"
-                       Text="Your Personal Cybersecurity Assistant"
-                       FontSize="14"
-                       Foreground="#BDC3C7"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,20"/>
+            <Border Grid.Row="0" VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center">
+                    <Border Background="{StaticResource SecondaryDark}" 
+                            CornerRadius="20" 
+                            Padding="30" 
+                            Margin="0,0,0,20">
+                        <Image Source="/logo.jpeg" Height="120" Width="120"/>
+                    </Border>
+                    <TextBlock Text="Cybersecurity Awareness Chatbot"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Your Personal Cybersecurity Assistant"
+                               FontSize="14"
+                               Foreground="#BDC3C7"
+                               HorizontalAlignment="Center"
+                               Margin="0,10,0,0"/>
+                </StackPanel>
+            </Border>
 
             <Button Grid.Row="3"
                     Content="Start Chatting"
-                    Height="40"
-                    Width="150"
-                    Background="#2ECC71"
+                    Height="45"
+                    Width="180"
+                    Background="{StaticResource AccentGreen}"
                     Foreground="White"
+                    FontSize="14"
+                    FontWeight="SemiBold"
                     BorderThickness="0"
                     Cursor="Hand"
                     Click="proceed"
@@ -51,108 +182,114 @@
                     Margin="0,0,0,50"/>
         </Grid>
 
-        <!-- USERNAME GRID -->
-        <Grid x:Name="username_grid" Visibility="Hidden" Background="#2C3E50">
+        <Grid x:Name="username_grid" Visibility="Hidden" Background="{StaticResource PrimaryDark}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Image Grid.Row="0"
-                   Source="/logo.jpeg" 
-                   Height="100"
-                   Width="100"
-                   HorizontalAlignment="Center"
-                   Margin="0,30,0,10"/>
-
-            <TextBlock Grid.Row="1"
-                       Text="Welcome!"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Foreground="White"
-                       HorizontalAlignment="Center"
-                       Margin="0,20,0,10"/>
-
-            <TextBlock Grid.Row="2"
-                       Text="Enter your name to begin"
-                       FontSize="14"
-                       Foreground="#BDC3C7"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,20"/>
+            <Border Grid.Row="0" VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center">
+                    <Border Background="{StaticResource SecondaryDark}" 
+                            CornerRadius="20" 
+                            Padding="20">
+                        <Image Source="/logo.jpeg" Height="80" Width="80"/>
+                    </Border>
+                    <TextBlock Text="Welcome!"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               Margin="0,20,0,5"/>
+                    <TextBlock Text="Enter your name to begin"
+                               FontSize="14"
+                               Foreground="#BDC3C7"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
 
             <TextBox Grid.Row="3"
                      x:Name="usernames_input"
-                     Height="35"
-                     Width="250"
+                     Height="40"
+                     Width="280"
                      FontSize="14"
                      TextAlignment="Center"
+                     Background="{StaticResource SecondaryDark}"
+                     Foreground="White"
+                     BorderBrush="{StaticResource AccentBlue}"
+                     BorderThickness="1"
                      HorizontalAlignment="Center"
-                     Margin="0,0,0,10"/>
+                     Margin="0,10,0,10"/>
 
             <TextBlock Grid.Row="4"
                        x:Name="errorMessage"
                        Text="Please enter your name"
                        FontSize="12"
-                       Foreground="#E74C3C"
+                       Foreground="{StaticResource AccentRed}"
                        HorizontalAlignment="Center"
                        Visibility="Collapsed"/>
 
             <Button Grid.Row="5"
                     Content="Continue"
-                    Height="35"
+                    Height="40"
                     Width="150"
-                    Background="#3498DB"
+                    Background="{StaticResource AccentBlue}"
                     Foreground="White"
+                    FontSize="14"
+                    FontWeight="SemiBold"
                     BorderThickness="0"
                     Cursor="Hand"
                     Click="submit_name"
                     HorizontalAlignment="Center"
-                    Margin="0,10,0,30"/>
+                    Margin="0,10,0,40"/>
         </Grid>
 
-        <!-- CHAT GRID -->
         <Grid x:Name="chat_grid" Visibility="Hidden">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="360"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0" Background="#ECF0F1">
+            <Grid Grid.Column="0" Background="{StaticResource ChatBg}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Header -->
-                <Border Grid.Row="0" Background="#2C3E50" Padding="10">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="/logo.jpeg" Height="30" Width="30" Margin="0,0,10,0"/>
-                        <TextBlock x:Name="botNameDisplay" 
-                                   Text="jordan" 
-                                   FontSize="16" 
-                                   FontWeight="Bold" 
-                                   Foreground="#2ECC71"
-                                   VerticalAlignment="Center"/>
+                <Border Grid.Row="0" Background="{StaticResource SecondaryDark}" Padding="15,10">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/logo.jpeg" Height="30" Width="30" Margin="0,0,10,0"/>
+                            <StackPanel>
+                                <TextBlock x:Name="botNameDisplay" 
+                                           Text="Jordan" 
+                                           FontSize="16" 
+                                           FontWeight="Bold" 
+                                           Foreground="{StaticResource AccentGreen}"/>
+                                <TextBlock Text="Cybersecurity Assistant"
+                                           FontSize="10"
+                                           Foreground="#888"/>
+                            </StackPanel>
+                        </StackPanel>
                         <TextBlock x:Name="QuizStatusDisplay" 
                                    Text="" 
                                    FontSize="12" 
-                                   Foreground="#F39C12"
+                                   Foreground="{StaticResource AccentOrange}"
                                    VerticalAlignment="Center"
-                                   Margin="20,0,0,0"/>
-                    </StackPanel>
+                                   HorizontalAlignment="Right"/>
+                    </Grid>
                 </Border>
 
-                <!-- Chat Area -->
                 <ListBox x:Name="chats" 
                          Grid.Row="1"
-                         Background="#ECF0F1"
-                         BorderThickness="0"/>
+                         Background="{StaticResource ChatBg}"
+                         BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
 
-                <!-- Input Area -->
                 <Border Grid.Row="2" Background="White" BorderBrush="#BDC3C7" BorderThickness="0,1,0,0" Padding="10">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -165,6 +302,9 @@
                                  Height="40"
                                  FontSize="14"
                                  VerticalContentAlignment="Center"
+                                 Background="#F8F9FA"
+                                 BorderBrush="#BDC3C7"
+                                 BorderThickness="1"
                                  KeyDown="question_KeyDown"/>
 
                         <Button Grid.Column="1"
@@ -172,8 +312,10 @@
                                 Height="35"
                                 Width="70"
                                 Margin="10,0,0,0"
-                                Background="#2ECC71"
+                                Background="{StaticResource AccentGreen}"
                                 Foreground="White"
+                                FontSize="12"
+                                FontWeight="SemiBold"
                                 BorderThickness="0"
                                 Cursor="Hand"
                                 Click="send"/>
@@ -181,26 +323,28 @@
                 </Border>
             </Grid>
 
-            <!-- Right Panel with Tabs -->
-            <Border Grid.Column="1" Background="#2C3E50" Padding="10">
+            <Border Grid.Column="1" Background="{StaticResource PrimaryDark}" Padding="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Tab Buttons -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                        <Button x:Name="TasksTabButton" Content="Tasks" 
-                                Background="#3498DB" Foreground="White"
-                                BorderThickness="0" Height="30" Width="100"
+                        <Button x:Name="TasksTabButton" 
+                                Content="Tasks" 
+                                Style="{StaticResource ActiveTabButton}"
                                 Click="TasksTabButton_Click"
-                                Margin="0,0,5,0"/>
-
-                        <Button x:Name="QuizTabButton" Content="Quiz" 
-                                Background="#F39C12" Foreground="White"
-                                BorderThickness="0" Height="30" Width="100"
-                                Click="QuizTabButton_Click"/>
+                                Margin="0,0,10,0"/>
+                        <Button x:Name="QuizTabButton" 
+                                Content="Quiz" 
+                                Style="{StaticResource TabButton}"
+                                Click="QuizTabButton_Click"
+                                Margin="0,0,10,0"/>
+                        <Button x:Name="LogTabButton" 
+                                Content="Log" 
+                                Style="{StaticResource TabButton}"
+                                Click="LogTabButton_Click"/>
                     </StackPanel>
 
                     <!-- Tasks Panel -->
@@ -212,9 +356,8 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Task Panel Header -->
                         <StackPanel Grid.Row="0" Margin="0,0,0,10">
-                            <TextBlock Text="MY TASKS" 
+                            <TextBlock Text="My Tasks" 
                                        FontSize="14" FontWeight="Bold"
                                        Foreground="White"/>
                             <TextBlock x:Name="TaskCountDisplay" 
@@ -223,10 +366,10 @@
                                        Foreground="#888"/>
                         </StackPanel>
 
-                        <!-- Add Task Section -->
-                        <Border Grid.Row="1" Background="#1A1A2E" CornerRadius="8" Padding="10">
+                        <Border Grid.Row="1" Background="{StaticResource CardBg}" CornerRadius="8" Padding="10">
                             <Grid>
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
@@ -234,18 +377,22 @@
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Grid.Row="0" Text="Add New Task" 
-                                           Foreground="#00B4D8"
+                                           Foreground="{StaticResource AccentBlue}"
                                            FontWeight="Bold" Margin="0,0,0,5"/>
 
                                 <TextBox x:Name="TaskTitleBox" Grid.Row="1"
-                                         Background="#2C3E50" Foreground="White"
-                                         BorderThickness="1" BorderBrush="#00B4D8"
+                                         Background="{StaticResource PrimaryDark}" 
+                                         Foreground="White"
+                                         BorderThickness="1" 
+                                         BorderBrush="{StaticResource AccentBlue}"
                                          Padding="8" Margin="0,0,0,5"
                                          Text="Enter task title..."/>
 
                                 <TextBox x:Name="TaskDescriptionBox" Grid.Row="2"
-                                         Background="#2C3E50" Foreground="White"
-                                         BorderThickness="1" BorderBrush="#00B4D8"
+                                         Background="{StaticResource PrimaryDark}" 
+                                         Foreground="White"
+                                         BorderThickness="1" 
+                                         BorderBrush="{StaticResource AccentBlue}"
                                          Padding="8" Margin="0,0,0,5"
                                          Text="Enter description..."/>
 
@@ -268,52 +415,46 @@
 
                                 <Button x:Name="AddTaskButton" Grid.Row="4"
                                         Content="Add Task" 
-                                        Background="#2ECC71"
+                                        Background="{StaticResource AccentGreen}"
                                         Foreground="White"
                                         BorderThickness="0"
                                         Height="30"
                                         Margin="0,10,0,0"
+                                        Style="{StaticResource ModernButton}"
                                         Click="AddTaskButton_Click"/>
                             </Grid>
                         </Border>
 
-                        <!-- Task List -->
                         <ListBox x:Name="TasksListBox" Grid.Row="2"
                                  Background="Transparent" 
                                  BorderThickness="0"
                                  Margin="0,10,0,0"
-                                 SelectionChanged="TasksListBox_SelectionChanged">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="#1A1A2E" CornerRadius="5" Margin="0,2">
-                                        <TextBlock Text="{Binding}" 
-                                                   TextWrapping="Wrap"
-                                                   Foreground="White"
-                                                   FontSize="12"
-                                                   Padding="8"/>
-                                    </Border>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                                 ItemContainerStyle="{StaticResource ListItemStyle}"
+                                 SelectionChanged="TasksListBox_SelectionChanged"/>
 
-                        <!-- Task Action Buttons -->
                         <StackPanel Grid.Row="3" Orientation="Horizontal" 
                                     Margin="0,10,0,0" HorizontalAlignment="Center">
                             <Button x:Name="CompleteTaskButton" Content="Complete" 
-                                    Background="#2ECC71" Foreground="White"
+                                    Background="{StaticResource AccentGreen}" 
+                                    Foreground="White"
                                     BorderThickness="0" Height="30" Width="80"
+                                    Style="{StaticResource ModernButton}"
                                     Click="CompleteTaskButton_Click"
                                     Margin="0,0,5,0"/>
 
                             <Button x:Name="DeleteTaskButton" Content="Delete" 
-                                    Background="#E74C3C" Foreground="White"
+                                    Background="{StaticResource AccentRed}" 
+                                    Foreground="White"
                                     BorderThickness="0" Height="30" Width="80"
+                                    Style="{StaticResource ModernButton}"
                                     Click="DeleteTaskButton_Click"
                                     Margin="0,0,5,0"/>
 
                             <Button x:Name="RefreshTasksButton" Content="Refresh" 
-                                    Background="#3498DB" Foreground="White"
+                                    Background="{StaticResource AccentBlue}" 
+                                    Foreground="White"
                                     BorderThickness="0" Height="30" Width="80"
+                                    Style="{StaticResource ModernButton}"
                                     Click="RefreshTasksButton_Click"/>
                         </StackPanel>
                     </Grid>
@@ -327,19 +468,17 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Quiz Header -->
                         <StackPanel Grid.Row="0" Margin="0,0,0,10">
-                            <TextBlock Text="CYBERSECURITY QUIZ" 
+                            <TextBlock Text="Cybersecurity Quiz" 
                                        FontSize="14" FontWeight="Bold"
-                                       Foreground="#F39C12"/>
+                                       Foreground="{StaticResource AccentOrange}"/>
                             <TextBlock x:Name="QuizScoreDisplay" 
                                        Text="Score: 0/0" 
                                        FontSize="11"
                                        Foreground="#888"/>
                         </StackPanel>
 
-                        <!-- Quiz Controls -->
-                        <Border Grid.Row="1" Background="#1A1A2E" CornerRadius="8" Padding="10">
+                        <Border Grid.Row="1" Background="{StaticResource CardBg}" CornerRadius="8" Padding="10">
                             <StackPanel>
                                 <TextBlock x:Name="QuizQuestionDisplay" 
                                            Text="Click 'Start Quiz' to test your cybersecurity knowledge!" 
@@ -350,43 +489,42 @@
 
                                 <Button x:Name="StartQuizButton" 
                                         Content="Start Quiz" 
-                                        Background="#F39C12"
+                                        Background="{StaticResource AccentOrange}"
                                         Foreground="White"
                                         BorderThickness="0"
                                         Height="35"
+                                        Style="{StaticResource ModernButton}"
                                         Click="StartQuizButton_Click"/>
                             </StackPanel>
                         </Border>
 
-                        <!-- Quiz Options -->
-                        <Border Grid.Row="2" Background="#1A1A2E" CornerRadius="8" Padding="10" Margin="0,10,0,0">
+                        <Border Grid.Row="2" Background="{StaticResource CardBg}" CornerRadius="8" Padding="10" Margin="0,10,0,0">
                             <StackPanel>
-                                <TextBlock Text="Quick Commands:" 
-                                           Foreground="#F39C12"
+                                <TextBlock Text="Quick Commands" 
+                                           Foreground="{StaticResource AccentOrange}"
                                            FontWeight="Bold"
                                            FontSize="11"
                                            Margin="0,0,0,5"/>
-                                <TextBlock Text="- Type 'start quiz' to begin" 
+                                <TextBlock Text="• Type 'start quiz' to begin" 
                                            Foreground="#888"
                                            FontSize="10"/>
-                                <TextBlock Text="- Type 'A', 'B', 'C', or 'D' to answer" 
+                                <TextBlock Text="• Type 'A', 'B', 'C', or 'D' to answer" 
                                            Foreground="#888"
                                            FontSize="10"/>
-                                <TextBlock Text="- Type 'True' or 'False' for true/false" 
+                                <TextBlock Text="• Type 'True' or 'False' for true/false" 
                                            Foreground="#888"
                                            FontSize="10"/>
-                                <TextBlock Text="- Type 'quit quiz' to end early" 
+                                <TextBlock Text="• Type 'quit quiz' to end early" 
                                            Foreground="#888"
                                            FontSize="10"/>
                             </StackPanel>
                         </Border>
 
-                        <!-- Quiz Progress -->
                         <StackPanel Grid.Row="3" Margin="0,10,0,0">
                             <ProgressBar x:Name="QuizProgressBar" 
-                                         Height="10" 
-                                         Background="#2C3E50"
-                                         Foreground="#F39C12"
+                                         Height="8" 
+                                         Background="{StaticResource CardBg}"
+                                         Foreground="{StaticResource AccentOrange}"
                                          Maximum="100"
                                          Value="0"/>
                             <TextBlock x:Name="QuizProgressText" 
@@ -395,6 +533,52 @@
                                        FontSize="10"
                                        HorizontalAlignment="Center"
                                        Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Log Panel -->
+                    <Grid x:Name="LogPanel" Grid.Row="1" Visibility="Hidden">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="Activity Log" 
+                                       FontSize="14" FontWeight="Bold"
+                                       Foreground="{StaticResource AccentBlue}"/>
+                            <TextBlock x:Name="LogCountDisplay" 
+                                       Text="0 entries" 
+                                       FontSize="11"
+                                       Foreground="#888"/>
+                        </StackPanel>
+
+                        <ListBox x:Name="LogListBox" Grid.Row="1"
+                                 Background="Transparent" 
+                                 BorderThickness="0"
+                                 Margin="0,0,0,10"
+                                 ItemContainerStyle="{StaticResource ListItemStyle}"/>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button x:Name="RefreshLogButton" 
+                                    Content="Refresh" 
+                                    Background="{StaticResource AccentBlue}"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Height="30" Width="80"
+                                    Style="{StaticResource ModernButton}"
+                                    Click="RefreshLogButton_Click"
+                                    Margin="0,0,5,0"/>
+
+                            <Button x:Name="ClearLogButton" 
+                                    Content="Clear" 
+                                    Background="{StaticResource AccentRed}"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Height="30" Width="80"
+                                    Style="{StaticResource ModernButton}"
+                                    Click="ClearLogButton_Click"/>
                         </StackPanel>
                     </Grid>
                 </Grid>

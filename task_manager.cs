@@ -351,22 +351,6 @@ namespace cybersecurity_chatbot_p2
             return dbHelper.DeleteTask(taskId);
         }
 
-        public string GetTasksForDisplay()
-        {
-            LoadTasks();
-            if (currentTasks.Count == 0)
-            {
-                return "No tasks found.";
-            }
-
-            string result = "";
-            foreach (var task in currentTasks)
-            {
-                result += task.GetDisplayString() + "\n";
-            }
-            return result;
-        }
-
         public bool IsWaitingForReminder()
         {
             return waitingForReminder;

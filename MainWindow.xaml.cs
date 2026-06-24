@@ -16,11 +16,9 @@ namespace cybersecurity_chatbot_p2
 {
     public partial class MainWindow : Window
     {
-        // Collections for responses
         private ArrayList reply = new ArrayList();
         private ArrayList ignore = new ArrayList();
 
-        // Class instances
         private response_finder finder;
         private response_handler handler;
         private topic_detector detector;
@@ -30,7 +28,6 @@ namespace cybersecurity_chatbot_p2
         private nlp_processor nlpProcessor;
         private activity_logger activityLogger;
 
-        // Variables
         private string username = string.Empty;
         private string currentTopic = string.Empty;
         private int messageCount = 0;
@@ -41,28 +38,18 @@ namespace cybersecurity_chatbot_p2
         {
             InitializeComponent();
 
-            // Initialize responses
             new respond(reply, ignore);
 
-            // Initialize all helper classes
             finder = new response_finder(reply);
             handler = new response_handler(reply, ignore);
             detector = new topic_detector();
             sentimentDetector = new sentiment_detector(reply, finder);
 
-            // Initialize Task Manager
             taskManager = new task_manager();
-
-            // Initialize Quiz Manager
             quizManager = new quiz_manager();
-
-            // Initialize NLP Processor
             nlpProcessor = new nlp_processor();
-
-            // Initialize Activity Logger
             activityLogger = new activity_logger();
 
-            // Subscribe to quiz events
             quizManager.OnQuestionDisplayed += (message) =>
             {
                 Dispatcher.Invoke(() =>
@@ -91,32 +78,44 @@ namespace cybersecurity_chatbot_p2
                 });
             };
 
-            // Play voice greeting
             new voice_greeting();
-
-            // Log system startup
             activityLogger.LogSystemStartup();
         }
 
-        // ============= NAVIGATION METHODS =============
+        // ============= NAVIGATION =============
 
         private void TasksTabButton_Click(object sender, RoutedEventArgs e)
         {
             TasksPanel.Visibility = Visibility.Visible;
             QuizPanel.Visibility = Visibility.Hidden;
-            TasksTabButton.Background = new SolidColorBrush(Color.FromRgb(52, 152, 219));
-            QuizTabButton.Background = new SolidColorBrush(Color.FromRgb(44, 62, 80));
+            LogPanel.Visibility = Visibility.Hidden;
+            TasksTabButton.Style = (Style)FindResource("ActiveTabButton");
+            QuizTabButton.Style = (Style)FindResource("TabButton");
+            LogTabButton.Style = (Style)FindResource("TabButton");
         }
 
         private void QuizTabButton_Click(object sender, RoutedEventArgs e)
         {
             TasksPanel.Visibility = Visibility.Hidden;
             QuizPanel.Visibility = Visibility.Visible;
-            QuizTabButton.Background = new SolidColorBrush(Color.FromRgb(243, 156, 18));
-            TasksTabButton.Background = new SolidColorBrush(Color.FromRgb(44, 62, 80));
+            LogPanel.Visibility = Visibility.Hidden;
+            TasksTabButton.Style = (Style)FindResource("TabButton");
+            QuizTabButton.Style = (Style)FindResource("ActiveTabButton");
+            LogTabButton.Style = (Style)FindResource("TabButton");
         }
 
-        // ============= QUIZ METHODS =============
+        private void LogTabButton_Click(object sender, RoutedEventArgs e)
+        {
+            TasksPanel.Visibility = Visibility.Hidden;
+            QuizPanel.Visibility = Visibility.Hidden;
+            LogPanel.Visibility = Visibility.Visible;
+            TasksTabButton.Style = (Style)FindResource("TabButton");
+            QuizTabButton.Style = (Style)FindResource("TabButton");
+            LogTabButton.Style = (Style)FindResource("ActiveTabButton");
+            RefreshLogDisplay();
+        }
+
+        // ============= QUIZ =============
 
         private void StartQuizButton_Click(object sender, RoutedEventArgs e)
         {
@@ -152,7 +151,55 @@ namespace cybersecurity_chatbot_p2
             }
         }
 
-        // ============= MAIN METHODS =============
+        // ============= ACTIVITY LOG =============
+
+        private void RefreshLogDisplay()
+        {
+            if (activityLogger != null)
+            {
+                var activities = activityLogger.GetRecentActivities(20);
+                LogListBox.Items.Clear();
+
+                if (activities.Count == 0)
+                {
+                    LogListBox.Items.Add("No activities logged yet.");
+                }
+                else
+                {
+                    int index = 1;
+                    foreach (var activity in activities)
+                    {
+                        LogListBox.Items.Add($"{index}. {activity}");
+                        index++;
+                    }
+                }
+
+                LogCountDisplay.Text = $"{activityLogger.GetLogCount()} entries";
+            }
+        }
+
+        private void RefreshLogButton_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshLogDisplay();
+            AddMessage("jordan", "Activity log refreshed.");
+        }
+
+        private void ClearLogButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Clear all activity log entries?",
+                                        "Confirm Clear",
+                                        MessageBoxButton.YesNo,
+                                        MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                activityLogger.ClearLog();
+                RefreshLogDisplay();
+                AddMessage("jordan", "Activity log cleared.");
+            }
+        }
+
+        // ============= MAIN =============
 
         private void proceed(object sender, RoutedEventArgs e)
         {
@@ -173,17 +220,13 @@ namespace cybersecurity_chatbot_p2
             username = enteredName;
             errorMessage.Visibility = Visibility.Collapsed;
 
-            // Set user in activity logger
             activityLogger.SetUser(username);
 
-            // Save user to file
             SaveUserToFile();
 
-            // Show chat interface
             username_grid.Visibility = Visibility.Hidden;
             chat_grid.Visibility = Visibility.Visible;
 
-            // Check if user exists and show appropriate welcome message
             if (IsExistingUser(username))
             {
                 AddMessage("jordan", $"Hey {username} welcome back, how can i help you today");
@@ -193,13 +236,8 @@ namespace cybersecurity_chatbot_p2
                 AddMessage("jordan", $"Hey {username} welcome to AI cybersecurity");
             }
 
-            // Recall previous interests
             RecallUserInterests();
-
-            // Load tasks
             LoadTasksUI();
-
-            // Log user login
             activityLogger.LogUserLogin(username);
         }
 
@@ -221,64 +259,62 @@ namespace cybersecurity_chatbot_p2
             if (string.IsNullOrWhiteSpace(userInput))
                 return;
 
-            // Show user message
             AddMessage(username, userInput);
-
-            // Process the input
             ProcessUserInput(userInput);
-
-            // Clear input
             question.Clear();
         }
 
         private void ProcessUserInput(string input)
         {
             string cleanInput = RemoveSpecialCharacters(input);
-
-            // ============= CHECK FOR LOG COMMAND =============
             string lowerInput = input.ToLower().Trim();
 
+            // Check for log command
             if (lowerInput.Contains("show log") || lowerInput.Contains("activity log") ||
                 lowerInput.Contains("what have you done") || lowerInput.Contains("recent actions") ||
                 lowerInput.Contains("what did you do") || lowerInput.Contains("show activity") ||
                 lowerInput.Contains("your actions") || lowerInput.Contains("summary"))
             {
-                // Check if user wants full log or specific type
                 if (lowerInput.Contains("full") || lowerInput.Contains("all") || lowerInput.Contains("complete"))
                 {
-                    ShowFullActivityLog();
+                    string logSummary = activityLogger.GetFullLogSummary();
+                    AddMessage("jordan", logSummary);
                 }
                 else if (lowerInput.Contains("task") && lowerInput.Contains("log"))
                 {
-                    ShowLogByType("Task");
+                    string logSummary = activityLogger.GetLogByType("Task");
+                    AddMessage("jordan", logSummary);
                 }
                 else if (lowerInput.Contains("quiz") && lowerInput.Contains("log"))
                 {
-                    ShowLogByType("Quiz");
+                    string logSummary = activityLogger.GetLogByType("Quiz");
+                    AddMessage("jordan", logSummary);
                 }
                 else if (lowerInput.Contains("reminder") && lowerInput.Contains("log"))
                 {
-                    ShowLogByType("Reminder");
+                    string logSummary = activityLogger.GetLogByType("Reminder");
+                    AddMessage("jordan", logSummary);
                 }
                 else if (lowerInput.Contains("nlp") && lowerInput.Contains("log"))
                 {
-                    ShowLogByType("NLP");
+                    string logSummary = activityLogger.GetLogByType("NLP");
+                    AddMessage("jordan", logSummary);
                 }
                 else
                 {
-                    ShowActivityLog(10);
+                    string logSummary = activityLogger.GetLogSummary(10);
+                    AddMessage("jordan", logSummary);
                 }
                 return;
             }
 
-            // ============= NLP PROCESSING =============
+            // NLP Processing
             if (nlpProcessor != null)
             {
                 string nlpResult = nlpProcessor.ProcessNaturalLanguage(input, taskManager, quizManager, username);
 
                 if (nlpResult != null)
                 {
-                    // Handle different NLP intents
                     if (nlpResult == "quiz")
                     {
                         string response = quizManager.StartQuiz();
@@ -297,7 +333,8 @@ namespace cybersecurity_chatbot_p2
                     }
                     else if (nlpResult == "log")
                     {
-                        ShowActivityLog(10);
+                        string logSummary = activityLogger.GetLogSummary(10);
+                        AddMessage("jordan", logSummary);
                         return;
                     }
                     else if (nlpResult.StartsWith("complete:"))
@@ -341,32 +378,29 @@ namespace cybersecurity_chatbot_p2
                 }
             }
 
-            // ============= QUIZ PROCESSING =============
-            if (quizManager != null)
+            // Quiz Processing
+            if (quizManager != null && quizManager.IsQuizActive)
             {
-                if (quizManager.IsQuizActive)
+                string quizResponse = quizManager.ProcessQuizInput(input);
+                if (quizResponse != null)
                 {
-                    string quizResponse = quizManager.ProcessQuizInput(input);
-                    if (quizResponse != null)
+                    AddMessage("jordan", quizResponse);
+
+                    if (quizManager.IsQuizActive)
                     {
-                        AddMessage("jordan", quizResponse);
-
-                        if (quizManager.IsQuizActive)
-                        {
-                            QuizScoreDisplay.Text = $"Score: {quizManager.CurrentScore}/{quizManager.CurrentQuestionNumber}";
-                        }
-                        else
-                        {
-                            QuizScoreDisplay.Text = $"Score: {quizManager.CurrentScore}/{quizManager.TotalQuestions}";
-                        }
-
-                        UpdateQuizProgress();
-                        return;
+                        QuizScoreDisplay.Text = $"Score: {quizManager.CurrentScore}/{quizManager.CurrentQuestionNumber}";
                     }
+                    else
+                    {
+                        QuizScoreDisplay.Text = $"Score: {quizManager.CurrentScore}/{quizManager.TotalQuestions}";
+                    }
+
+                    UpdateQuizProgress();
+                    return;
                 }
             }
 
-            // ============= TASK MANAGER PROCESSING =============
+            // Task Manager Processing
             if (taskManager != null)
             {
                 string taskResponse = taskManager.ProcessTaskInput(input);
@@ -384,7 +418,7 @@ namespace cybersecurity_chatbot_p2
                 }
             }
 
-            // Check for sentiment
+            // Sentiment Detection
             string sentiment = sentimentDetector.DetectSentiment(cleanInput);
             if (sentiment != "neutral")
             {
@@ -394,7 +428,7 @@ namespace cybersecurity_chatbot_p2
                 return;
             }
 
-            // Check for follow-up questions
+            // Follow-up Questions
             if (handler.IsFollowUpRequest(cleanInput) && !string.IsNullOrEmpty(currentTopic))
             {
                 string response = finder.GetResponseByTopic(currentTopic);
@@ -403,7 +437,7 @@ namespace cybersecurity_chatbot_p2
                 return;
             }
 
-            // Check for help
+            // Help
             if (cleanInput.Contains("help") || cleanInput.Contains("what can you do"))
             {
                 string helpResponse = nlpProcessor.GetHelpResponse();
@@ -411,7 +445,7 @@ namespace cybersecurity_chatbot_p2
                 return;
             }
 
-            // Detect topic
+            // Topic Detection
             string detectedTopic = detector.DetectTopic(cleanInput);
 
             if (!string.IsNullOrEmpty(detectedTopic))
@@ -434,26 +468,6 @@ namespace cybersecurity_chatbot_p2
             }
 
             messageCount++;
-        }
-
-        // ============= ACTIVITY LOG METHODS =============
-
-        private void ShowActivityLog(int count = 10)
-        {
-            string logSummary = activityLogger.GetLogSummary(count);
-            AddMessage("jordan", logSummary);
-        }
-
-        private void ShowFullActivityLog()
-        {
-            string logSummary = activityLogger.GetFullLogSummary();
-            AddMessage("jordan", logSummary);
-        }
-
-        private void ShowLogByType(string actionType)
-        {
-            string logSummary = activityLogger.GetLogByType(actionType);
-            AddMessage("jordan", logSummary);
         }
 
         // ============= NLP HELPER METHODS =============
@@ -789,6 +803,16 @@ namespace cybersecurity_chatbot_p2
 
         private void CompleteTaskButton_Click(object sender, RoutedEventArgs e)
         {
+            if (selectedTask == null && TasksListBox.Items.Count > 0)
+            {
+                TasksListBox.SelectedIndex = 0;
+                var tasks = taskManager.GetTasks();
+                if (TasksListBox.SelectedIndex < tasks.Count)
+                {
+                    selectedTask = tasks[TasksListBox.SelectedIndex];
+                }
+            }
+
             if (selectedTask == null)
             {
                 AddMessage("jordan", "Please select a task to complete.");
@@ -816,6 +840,16 @@ namespace cybersecurity_chatbot_p2
 
         private void DeleteTaskButton_Click(object sender, RoutedEventArgs e)
         {
+            if (selectedTask == null && TasksListBox.Items.Count > 0)
+            {
+                TasksListBox.SelectedIndex = 0;
+                var tasks = taskManager.GetTasks();
+                if (TasksListBox.SelectedIndex < tasks.Count)
+                {
+                    selectedTask = tasks[TasksListBox.SelectedIndex];
+                }
+            }
+
             if (selectedTask == null)
             {
                 AddMessage("jordan", "Please select a task to delete.");
@@ -845,8 +879,16 @@ namespace cybersecurity_chatbot_p2
 
         private void RefreshTasksButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadTasksUI();
-            AddMessage("jordan", "Task list refreshed.");
+            if (taskManager != null)
+            {
+                taskManager.LoadTasks();
+                LoadTasksUI();
+                AddMessage("jordan", "Task list refreshed.");
+            }
+            else
+            {
+                AddMessage("jordan", "Task manager not initialized.");
+            }
         }
 
         private void SetReminderCheck_Checked(object sender, RoutedEventArgs e)
@@ -859,8 +901,6 @@ namespace cybersecurity_chatbot_p2
         {
             ReminderDatePicker.Visibility = Visibility.Collapsed;
         }
-
-        // ============= WINDOW CLOSING =============
 
         protected override void OnClosed(EventArgs e)
         {
