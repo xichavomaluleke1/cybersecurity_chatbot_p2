@@ -57,6 +57,8 @@
     </ApplicationDefinition>
     <Compile Include="database_helper.cs" />
     <Compile Include="message_displayer.cs" />
+    <Compile Include="QuizQuestion.cs" />
+    <Compile Include="quiz_manager.cs" />
     <Compile Include="respond.cs" />
     <Compile Include="response_finder.cs" />
     <Compile Include="response_handler.cs" />

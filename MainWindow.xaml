@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:cybersecurity_chatbot_p2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="550" Width="900">
+        Title="MainWindow" Height="600" Width="1000">
     <Grid>
         <!-- HOME GRID -->
         <Grid x:Name="home_grid" Visibility="Visible" Background="#2C3E50">
@@ -137,6 +137,12 @@
                                    FontWeight="Bold" 
                                    Foreground="#2ECC71"
                                    VerticalAlignment="Center"/>
+                        <TextBlock x:Name="QuizStatusDisplay" 
+                                   Text="" 
+                                   FontSize="12" 
+                                   Foreground="#F39C12"
+                                   VerticalAlignment="Center"
+                                   Margin="20,0,0,0"/>
                     </StackPanel>
                 </Border>
 
@@ -175,120 +181,222 @@
                 </Border>
             </Grid>
 
-            <!-- Task Panel -->
+            <!-- Right Panel with Tabs -->
             <Border Grid.Column="1" Background="#2C3E50" Padding="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Task Panel Header -->
-                    <StackPanel Grid.Row="0" Margin="0,0,0,10">
-                        <TextBlock Text="MY TASKS" 
-                                   FontSize="14" FontWeight="Bold"
-                                   Foreground="White"/>
-                        <TextBlock x:Name="TaskCountDisplay" 
-                                   Text="0 pending, 0 completed" 
-                                   FontSize="11"
-                                   Foreground="#888"/>
-                    </StackPanel>
-
-                    <!-- Add Task Section -->
-                    <Border Grid.Row="1" Background="#1A1A2E" CornerRadius="8" Padding="10">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" Text="Add New Task" 
-                                       Foreground="#00B4D8"
-                                       FontWeight="Bold" Margin="0,0,0,5"/>
-
-                            <TextBox x:Name="TaskTitleBox" Grid.Row="1"
-                                     Background="#2C3E50" Foreground="White"
-                                     BorderThickness="1" BorderBrush="#00B4D8"
-                                     Padding="8" Margin="0,0,0,5"
-                                     Text="Enter task title..."/>
-
-                            <TextBox x:Name="TaskDescriptionBox" Grid.Row="2"
-                                     Background="#2C3E50" Foreground="White"
-                                     BorderThickness="1" BorderBrush="#00B4D8"
-                                     Padding="8" Margin="0,0,0,5"
-                                     Text="Enter description..."/>
-
-                            <Grid Grid.Row="3" Margin="0,5,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <CheckBox x:Name="SetReminderCheck" Grid.Column="0"
-                                          Content="Set Reminder" 
-                                          Foreground="White"
-                                          Checked="SetReminderCheck_Checked"
-                                          Unchecked="SetReminderCheck_Unchecked"/>
-
-                                <DatePicker x:Name="ReminderDatePicker" Grid.Column="1"
-                                            Width="120" Height="25"
-                                            Visibility="Collapsed"/>
-                            </Grid>
-
-                            <Button x:Name="AddTaskButton" Grid.Row="4"
-                                    Content="Add Task" 
-                                    Background="#2ECC71"
-                                    Foreground="White"
-                                    BorderThickness="0"
-                                    Height="30"
-                                    Margin="0,10,0,0"
-                                    Click="AddTaskButton_Click"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- Task List -->
-                    <ListBox x:Name="TasksListBox" Grid.Row="2"
-                             Background="Transparent" 
-                             BorderThickness="0"
-                             Margin="0,10,0,0"
-                             SelectionChanged="TasksListBox_SelectionChanged">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="#1A1A2E" CornerRadius="5" Margin="0,2">
-                                    <TextBlock Text="{Binding}" 
-                                               TextWrapping="Wrap"
-                                               Foreground="White"
-                                               FontSize="12"
-                                               Padding="8"/>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-
-                    <!-- Task Action Buttons -->
-                    <StackPanel Grid.Row="3" Orientation="Horizontal" 
-                                Margin="0,10,0,0" HorizontalAlignment="Center">
-                        <Button x:Name="CompleteTaskButton" Content="Complete" 
-                                Background="#2ECC71" Foreground="White"
-                                BorderThickness="0" Height="30" Width="80"
-                                Click="CompleteTaskButton_Click"
-                                Margin="0,0,5,0"/>
-
-                        <Button x:Name="DeleteTaskButton" Content="Delete" 
-                                Background="#E74C3C" Foreground="White"
-                                BorderThickness="0" Height="30" Width="80"
-                                Click="DeleteTaskButton_Click"
-                                Margin="0,0,5,0"/>
-
-                        <Button x:Name="RefreshTasksButton" Content="Refresh" 
+                    <!-- Tab Buttons -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                        <Button x:Name="TasksTabButton" Content="Tasks" 
                                 Background="#3498DB" Foreground="White"
-                                BorderThickness="0" Height="30" Width="80"
-                                Click="RefreshTasksButton_Click"/>
+                                BorderThickness="0" Height="30" Width="100"
+                                Click="TasksTabButton_Click"
+                                Margin="0,0,5,0"/>
+
+                        <Button x:Name="QuizTabButton" Content="Quiz" 
+                                Background="#F39C12" Foreground="White"
+                                BorderThickness="0" Height="30" Width="100"
+                                Click="QuizTabButton_Click"/>
                     </StackPanel>
+
+                    <!-- Tasks Panel -->
+                    <Grid x:Name="TasksPanel" Grid.Row="1" Visibility="Visible">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Task Panel Header -->
+                        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="MY TASKS" 
+                                       FontSize="14" FontWeight="Bold"
+                                       Foreground="White"/>
+                            <TextBlock x:Name="TaskCountDisplay" 
+                                       Text="0 pending, 0 completed" 
+                                       FontSize="11"
+                                       Foreground="#888"/>
+                        </StackPanel>
+
+                        <!-- Add Task Section -->
+                        <Border Grid.Row="1" Background="#1A1A2E" CornerRadius="8" Padding="10">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Text="Add New Task" 
+                                           Foreground="#00B4D8"
+                                           FontWeight="Bold" Margin="0,0,0,5"/>
+
+                                <TextBox x:Name="TaskTitleBox" Grid.Row="1"
+                                         Background="#2C3E50" Foreground="White"
+                                         BorderThickness="1" BorderBrush="#00B4D8"
+                                         Padding="8" Margin="0,0,0,5"
+                                         Text="Enter task title..."/>
+
+                                <TextBox x:Name="TaskDescriptionBox" Grid.Row="2"
+                                         Background="#2C3E50" Foreground="White"
+                                         BorderThickness="1" BorderBrush="#00B4D8"
+                                         Padding="8" Margin="0,0,0,5"
+                                         Text="Enter description..."/>
+
+                                <Grid Grid.Row="3" Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <CheckBox x:Name="SetReminderCheck" Grid.Column="0"
+                                              Content="Set Reminder" 
+                                              Foreground="White"
+                                              Checked="SetReminderCheck_Checked"
+                                              Unchecked="SetReminderCheck_Unchecked"/>
+
+                                    <DatePicker x:Name="ReminderDatePicker" Grid.Column="1"
+                                                Width="120" Height="25"
+                                                Visibility="Collapsed"/>
+                                </Grid>
+
+                                <Button x:Name="AddTaskButton" Grid.Row="4"
+                                        Content="Add Task" 
+                                        Background="#2ECC71"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        Height="30"
+                                        Margin="0,10,0,0"
+                                        Click="AddTaskButton_Click"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Task List -->
+                        <ListBox x:Name="TasksListBox" Grid.Row="2"
+                                 Background="Transparent" 
+                                 BorderThickness="0"
+                                 Margin="0,10,0,0"
+                                 SelectionChanged="TasksListBox_SelectionChanged">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#1A1A2E" CornerRadius="5" Margin="0,2">
+                                        <TextBlock Text="{Binding}" 
+                                                   TextWrapping="Wrap"
+                                                   Foreground="White"
+                                                   FontSize="12"
+                                                   Padding="8"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <!-- Task Action Buttons -->
+                        <StackPanel Grid.Row="3" Orientation="Horizontal" 
+                                    Margin="0,10,0,0" HorizontalAlignment="Center">
+                            <Button x:Name="CompleteTaskButton" Content="Complete" 
+                                    Background="#2ECC71" Foreground="White"
+                                    BorderThickness="0" Height="30" Width="80"
+                                    Click="CompleteTaskButton_Click"
+                                    Margin="0,0,5,0"/>
+
+                            <Button x:Name="DeleteTaskButton" Content="Delete" 
+                                    Background="#E74C3C" Foreground="White"
+                                    BorderThickness="0" Height="30" Width="80"
+                                    Click="DeleteTaskButton_Click"
+                                    Margin="0,0,5,0"/>
+
+                            <Button x:Name="RefreshTasksButton" Content="Refresh" 
+                                    Background="#3498DB" Foreground="White"
+                                    BorderThickness="0" Height="30" Width="80"
+                                    Click="RefreshTasksButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Quiz Panel -->
+                    <Grid x:Name="QuizPanel" Grid.Row="1" Visibility="Hidden">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Quiz Header -->
+                        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="CYBERSECURITY QUIZ" 
+                                       FontSize="14" FontWeight="Bold"
+                                       Foreground="#F39C12"/>
+                            <TextBlock x:Name="QuizScoreDisplay" 
+                                       Text="Score: 0/0" 
+                                       FontSize="11"
+                                       Foreground="#888"/>
+                        </StackPanel>
+
+                        <!-- Quiz Controls -->
+                        <Border Grid.Row="1" Background="#1A1A2E" CornerRadius="8" Padding="10">
+                            <StackPanel>
+                                <TextBlock x:Name="QuizQuestionDisplay" 
+                                           Text="Click 'Start Quiz' to test your cybersecurity knowledge!" 
+                                           Foreground="White"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Margin="0,0,0,10"/>
+
+                                <Button x:Name="StartQuizButton" 
+                                        Content="Start Quiz" 
+                                        Background="#F39C12"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        Height="35"
+                                        Click="StartQuizButton_Click"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Quiz Options -->
+                        <Border Grid.Row="2" Background="#1A1A2E" CornerRadius="8" Padding="10" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Quick Commands:" 
+                                           Foreground="#F39C12"
+                                           FontWeight="Bold"
+                                           FontSize="11"
+                                           Margin="0,0,0,5"/>
+                                <TextBlock Text="- Type 'start quiz' to begin" 
+                                           Foreground="#888"
+                                           FontSize="10"/>
+                                <TextBlock Text="- Type 'A', 'B', 'C', or 'D' to answer" 
+                                           Foreground="#888"
+                                           FontSize="10"/>
+                                <TextBlock Text="- Type 'True' or 'False' for true/false" 
+                                           Foreground="#888"
+                                           FontSize="10"/>
+                                <TextBlock Text="- Type 'quit quiz' to end early" 
+                                           Foreground="#888"
+                                           FontSize="10"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Quiz Progress -->
+                        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+                            <ProgressBar x:Name="QuizProgressBar" 
+                                         Height="10" 
+                                         Background="#2C3E50"
+                                         Foreground="#F39C12"
+                                         Maximum="100"
+                                         Value="0"/>
+                            <TextBlock x:Name="QuizProgressText" 
+                                       Text="0% Complete" 
+                                       Foreground="#888"
+                                       FontSize="10"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>

@@ -25,6 +25,7 @@ namespace cybersecurity_chatbot_p2
         private topic_detector detector;
         private sentiment_detector sentimentDetector;
         private task_manager taskManager;
+        private quiz_manager quizManager;
 
         // Variables
         private string username = string.Empty;
@@ -49,9 +50,95 @@ namespace cybersecurity_chatbot_p2
             // Initialize Task Manager
             taskManager = new task_manager();
 
+            // Initialize Quiz Manager
+            quizManager = new quiz_manager();
+
+            // Subscribe to quiz events
+            quizManager.OnQuestionDisplayed += (message) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    QuizQuestionDisplay.Text = message;
+                    UpdateQuizProgress();
+                });
+            };
+
+            quizManager.OnFeedbackGiven += (feedback) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    QuizQuestionDisplay.Text = feedback;
+                    UpdateQuizProgress();
+                });
+            };
+
+            quizManager.OnQuizCompleted += (score, total, feedback) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    QuizScoreDisplay.Text = $"Score: {score}/{total}";
+                    UpdateQuizProgress();
+                });
+            };
+
             // Play voice greeting
             new voice_greeting();
         }
+
+        // ============= NAVIGATION METHODS =============
+
+        private void TasksTabButton_Click(object sender, RoutedEventArgs e)
+        {
+            TasksPanel.Visibility = Visibility.Visible;
+            QuizPanel.Visibility = Visibility.Hidden;
+            TasksTabButton.Background = new SolidColorBrush(Color.FromRgb(52, 152, 219));
+            QuizTabButton.Background = new SolidColorBrush(Color.FromRgb(44, 62, 80));
+        }
+
+        private void QuizTabButton_Click(object sender, RoutedEventArgs e)
+        {
+            TasksPanel.Visibility = Visibility.Hidden;
+            QuizPanel.Visibility = Visibility.Visible;
+            QuizTabButton.Background = new SolidColorBrush(Color.FromRgb(243, 156, 18));
+            TasksTabButton.Background = new SolidColorBrush(Color.FromRgb(44, 62, 80));
+        }
+
+        // ============= QUIZ METHODS =============
+
+        private void StartQuizButton_Click(object sender, RoutedEventArgs e)
+        {
+            string response = quizManager.StartQuiz();
+            QuizScoreDisplay.Text = "Score: 0/0";
+            AddMessage("jordan", response);
+
+            if (quizManager.TotalQuestions > 0)
+            {
+                QuizProgressBar.Maximum = quizManager.TotalQuestions;
+            }
+            UpdateQuizProgress();
+        }
+
+        private void UpdateQuizProgress()
+        {
+            if (quizManager.TotalQuestions > 0)
+            {
+                double progress = (double)quizManager.CurrentQuestionNumber / quizManager.TotalQuestions * 100;
+                QuizProgressBar.Value = Math.Min(progress, 100);
+                QuizProgressText.Text = $"{Math.Min(progress, 100):F0}% Complete";
+            }
+
+            if (quizManager.IsQuizActive)
+            {
+                QuizStatusDisplay.Text = "Quiz in progress";
+                QuizStatusDisplay.Foreground = new SolidColorBrush(Colors.Orange);
+            }
+            else
+            {
+                QuizStatusDisplay.Text = "";
+            }
+        }
+
+        // ============= MAIN METHODS =============
 
         private void proceed(object sender, RoutedEventArgs e)
         {
@@ -128,6 +215,35 @@ namespace cybersecurity_chatbot_p2
         {
             string cleanInput = RemoveSpecialCharacters(input);
 
+            // ============= QUIZ PROCESSING (Priority) =============
+            if (quizManager != null)
+            {
+                // Check if quiz is active or user wants to start quiz
+                if (quizManager.IsQuizActive || input.ToLower().Contains("start quiz") ||
+                    input.ToLower().Contains("take quiz") || input.ToLower().Contains("play quiz") ||
+                    input.ToLower().Contains("quiz me"))
+                {
+                    string quizResponse = quizManager.ProcessQuizInput(input);
+                    if (quizResponse != null)
+                    {
+                        AddMessage("jordan", quizResponse);
+
+                        // Update quiz score in UI
+                        if (quizManager.IsQuizActive)
+                        {
+                            QuizScoreDisplay.Text = $"Score: {quizManager.CurrentScore}/{quizManager.CurrentQuestionNumber}";
+                        }
+                        else
+                        {
+                            QuizScoreDisplay.Text = $"Score: {quizManager.CurrentScore}/{quizManager.TotalQuestions}";
+                        }
+
+                        UpdateQuizProgress();
+                        return;
+                    }
+                }
+            }
+
             // ============= TASK MANAGER PROCESSING =============
             if (taskManager != null)
             {
@@ -182,7 +298,8 @@ namespace cybersecurity_chatbot_p2
                 string[] defaults = {
                     "I'm not sure I understand. Try asking about passwords, scams, or privacy.",
                     "Hmm, can you rephrase that? I can help with cybersecurity topics.",
-                    "I don't recognize that. Ask me about online safety and security tips."
+                    "I don't recognize that. Ask me about online safety and security tips.",
+                    "You can also type 'start quiz' to test your cybersecurity knowledge!"
                 };
                 AddMessage("jordan", defaults[random.Next(defaults.Length)]);
             }
